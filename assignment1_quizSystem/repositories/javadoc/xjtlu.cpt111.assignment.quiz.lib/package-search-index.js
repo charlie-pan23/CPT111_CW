@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"xjtlu.cpt111.assignment.quiz.lib","l":"xjtlu.cpt111.assignment.quiz.lang"},{"m":"xjtlu.cpt111.assignment.quiz.lib","l":"xjtlu.cpt111.assignment.quiz.model"},{"m":"xjtlu.cpt111.assignment.quiz.lib","l":"xjtlu.cpt111.assignment.quiz.util"}];updateSearchResults();
