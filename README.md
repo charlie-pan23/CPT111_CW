@@ -6,7 +6,6 @@ and interactive platform that enhances the learning experience through topic sel
 assignment.
 ## Existing problems
 - Does this CW need a GUI?
-- 
 ## Task distribution
 ### Main --pmc
 - TBD
@@ -17,10 +16,8 @@ assignment.
   - write_user_score(str name, str topic, double score) 
   - read_user_score() -> str[][]
   - read_topic_score() -> str[][]
-  - 
 ### Class questionBank --cfy
-- constructor
-  - 
+- constructor   
 - Method
   - get_random_question(str topic, str difficulty) -> Question
 ### --wd
@@ -29,7 +26,7 @@ assignment.
     - InputStream (implements Closeable)
       - FilterInputStream
         - XmlInputStream
-    - IOUtilities (implements AppConstants)
+    - IOUtilities (implements AppConstants)snake_case
     - Option
     - Question (implements AppConstants)
     - XmlEntity
@@ -40,9 +37,8 @@ assignment.
   - Object
     - Enum (implements Comparable, Constable, Serializable)
     - Difficulty
-
 ### report --zzy
 
 ## NOTE
-- the class name follow
-- 确保对不同的csv和xml都生效
+- The class name follow Camel Case `camelCase`, while function/method and variable follow Snake Case `snake_case`
+- Ensure the code works for ANY csv and xml
