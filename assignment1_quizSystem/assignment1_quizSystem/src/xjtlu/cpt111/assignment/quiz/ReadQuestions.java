@@ -1,4 +1,4 @@
-package xjtlu.cpt111.assignment.quiz;
+/*package xjtlu.cpt111.assignment.quiz;
 
 import xjtlu.cpt111.assignment.quiz.model.Question;
 import xjtlu.cpt111.assignment.quiz.util.IOUtilities;
@@ -36,3 +36,4 @@ public class ReadQuestions {
 	}
 
 }
+*/
