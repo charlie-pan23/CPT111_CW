@@ -7,18 +7,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 public class userBank {
-    private static String users_csv_path = "C:/Users/28491/Desktop/Lab/Codetest/java/CW3/CPT111_CW/assignment1_quizSystem/assignment1_quizSystem/resources/users.csv";// TODO:
-    private static String users_scores_csv_path = "C:/Users/28491/Desktop/Lab/Codetest/java/CW3/CPT111_CW/assignment1_quizSystem/assignment1_quizSystem/resources/users_scores.csv";// TODO:
+    private static final String users_csv_path = "./assignment1_quizSystem/assignment1_quizSystem/resources/users.csv";// TODO:
+    private static final String users_scores_csv_path = "./assignment1_quizSystem/assignment1_quizSystem/resources/users_scores.csv";// TODO:
     private String[][] users_data;
     private String[][] users_scores_data;
-    private static String[] topic_list = { "cs", "ee", "english", "mathematics" };// TODO：可以从主类里传过来
+    private String[] topic_list = { "cs", "ee", "english", "mathematics" };// TODO：可以从主类里传过来
 
-    public userBank() throws IOException {
+    public userBank(String[] topic_list_new ) throws IOException {
+        this.topic_list = topic_list_new;
         try {
-            users_data = refresh_data("users");
-            users_scores_data = refresh_data("users_scores");
+            this.users_data = refresh_data("users");
+            this.users_scores_data = refresh_data("users_scores");
         } catch (IOException e) {
             throw e; // or use System.exit(1);
         }
@@ -68,9 +70,9 @@ public class userBank {
     }
 
     public boolean check_user(String name, String pwd) {
-        for (int i = 0; i < users_data.length; i++) {
-            if (name == users_data[i][1]) { // TODO:The order of name and pwd is to be decide
-                if (pwd == users_data[i][2]) {
+        for (int i = 0; i < this.users_data.length; i++) {
+            if (Objects.equals(name, this.users_data[i][1])) { // TODO:The order of name and pwd is to be decide
+                if (Objects.equals(pwd, this.users_data[i][2])) {
                     return true;
                 } else {
                     return false; // 找到了但是密码错了
@@ -80,37 +82,43 @@ public class userBank {
         return false; // 没有找到用户名 两者是不是要分开处理
     }
 
+    public boolean check_user(String name) {
+
+        for (int i = 0; i < this.users_data.length; i++) {
+            if (Objects.equals(name, this.users_data[i][1])) { // TODO:The order of name and pwd is to be decide
+                    return false;
+            }
+        }
+        return true; // 没有找到用户名 两者是不是要分开处理
+    }
+
     public int write_user(String name, String pwd) throws IOException {
-        for (int i = 0; i < users_data.length; i++) {
-            if (users_data[i][1] == name) {
+        for (int i = 0; i < this.users_data.length; i++) {
+            if (Objects.equals(this.users_data[i][1], name)) {
                 return 1; // 用户名重复
             }
-            if (detect_empty_row(users_data, i)) {
-                users_data[i][1] = name;
-                users_data[i][2] = pwd;
-                try {
-                    write_to_csv(users_data, users_csv_path);
-                    refresh_data("users");
-                } catch (IOException e) {
-                    throw e;
-                }
+            if (detect_empty_row(this.users_data, i)) {
+                this.users_data[i][1] = name;
+                this.users_data[i][2] = pwd;
+                write_to_csv(this.users_data, users_csv_path);
+                this.users_data=refresh_data("users");
                 return 0;
             }
         }
-        users_data = double_StringList_rownum(users_data);
+        this.users_data = double_StringList_rownum(this.users_data);
         return write_user(name, pwd);
     }
 
     public void write_user_score(String name, String topic, String finished_time, double score) throws IOException {
-        for (int i = 0; i < users_scores_data.length; i++) {
-            if (detect_empty_row(users_data, i)) {
-                users_scores_data[i][0] = name;// TODO:The order of name, topic, finished_time and scores is to be
+        for (int i = 0; i < this.users_scores_data.length; i++) {
+            if (detect_empty_row(this.users_data, i)) {
+                this.users_scores_data[i][0] = name;// TODO:The order of name, topic, finished_time and scores is to be
                                                // decide
-                users_scores_data[i][1] = topic;
-                users_scores_data[i][2] = finished_time; // 不太确定是否真的需要
-                users_scores_data[i][3] = "" + score;
+                this.users_scores_data[i][1] = topic;
+                this.users_scores_data[i][2] = finished_time; // 不太确定是否真的需要
+                this.users_scores_data[i][3] = "" + score;
                 try {
-                    write_to_csv(users_scores_data, users_scores_csv_path);
+                    write_to_csv(this.users_scores_data, users_scores_csv_path);
                     refresh_data("users_scores");
                 } catch (IOException e) {
                     throw e;
@@ -118,7 +126,7 @@ public class userBank {
                 return;// TODO:这里似乎不会有错 直接return了
             }
         }
-        users_scores_data = double_StringList_rownum(users_scores_data);
+        this.users_scores_data = double_StringList_rownum(this.users_scores_data);
         write_user_score(name, topic, finished_time, score);
     }
 
@@ -128,13 +136,13 @@ public class userBank {
         for (int i = 0; i < counter.length; i++) {
             counter[i] = -1;
         }
-        for (int i = users_scores_data.length - 1; i > -1; i--) {
-            if (users_scores_data[i][0] == name) {
+        for (int i = this.users_scores_data.length - 1; i > -1; i--) {
+            if (this.users_scores_data[i][0] == name) {
                 for (int j = 0; j < topic_list.length; j++) {
-                    if (users_scores_data[i][1] == topic_list[j]) {
+                    if (this.users_scores_data[i][1] == topic_list[j]) {
                         counter[j] = counter[j] + 1;
                         if (counter[j] < 3) {
-                            user_scores[j][counter[j]] = users_scores_data[i][3];
+                            user_scores[j][counter[j]] = this.users_scores_data[i][3];
                         } // TODO:应该还能写counter全大于三就提交前结束
                         break;
                     }
@@ -146,10 +154,10 @@ public class userBank {
 
     public String[] read_topic_score() {
         String[] topics_score = new String[topic_list.length];
-        for (int i = users_scores_data.length - 1; i > -1; i--) {
+        for (int i = this.users_scores_data.length - 1; i > -1; i--) {
             for (int j = 0; j < topic_list.length; j++) {
-                if (users_scores_data[i][1] == topic_list[j]) {
-                    topics_score[j] = "" + Math.max(Double.parseDouble(users_scores_data[i][3]),
+                if (Objects.equals(this.users_scores_data[i][1], topic_list[j])) {
+                    topics_score[j] = "" + Math.max(Double.parseDouble(this.users_scores_data[i][3]),
                             Double.parseDouble(topics_score[j])); // NumberFormatException 未处理
                     break;
                 }
@@ -180,7 +188,6 @@ public class userBank {
                 }
                 writer.newLine(); // 换行
             }
-            System.out.println("CSV file was written successfully.");
         } catch (IOException e) {
             throw e;
         }
@@ -190,9 +197,9 @@ public class userBank {
         int maxRetries = 3;
         int retries = 0;
         String path = "";
-        if (type == "users") {
+        if (Objects.equals(type, "users")) {
             path = users_csv_path;
-        } else if (type == "users_scores") {
+        } else if (Objects.equals(type, "users_scores")) {
             path = users_scores_csv_path;
         } else {
             System.exit(1);// TODO:
