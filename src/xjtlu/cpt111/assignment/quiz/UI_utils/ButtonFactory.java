@@ -4,6 +4,8 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
+
 public class ButtonFactory {
     public static Button createButton(String text, double minWidth, double minHeight, double maxWidth, double maxHeight, VBox container) {
         Button button = new Button(text);
@@ -32,7 +34,13 @@ public class ButtonFactory {
 
     public static Button createButtonWithAction(String text, VBox container, ButtonAction action) {
         Button button = createButton(text, 0, 0, 0, 0, container);
-        button.setOnAction(event -> action.execute());
+        button.setOnAction(event -> {
+            try {
+                action.execute();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return button;
     }
 }

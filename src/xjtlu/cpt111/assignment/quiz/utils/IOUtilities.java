@@ -1,16 +1,14 @@
 package xjtlu.cpt111.assignment.quiz.utils;
+
 import xjtlu.cpt111.assignment.quiz.models.Difficulty;
 import xjtlu.cpt111.assignment.quiz.models.Option;
 import xjtlu.cpt111.assignment.quiz.models.Question;
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Scanner;
 import java.io.File;
 import java.util.ArrayList;
-
 
 public class IOUtilities {
     public static Question[] readQuestions(String directoryPath) {
