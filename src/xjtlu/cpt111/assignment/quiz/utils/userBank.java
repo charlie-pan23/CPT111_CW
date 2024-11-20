@@ -40,9 +40,9 @@ public class userBank {
     }
 
     public boolean check_user(String name, String pwd) {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(name, this.users_data.get(i)[1])) { // TODO:The order of name and pwd is to be decide
-                if (Objects.equals(pwd, this.users_data.get(i)[2])) {
+        for (String[] row : users_data) {
+            if (Objects.equals(name, row[0])) {
+                if (Objects.equals(pwd, row[2])) {
                     return true;
                 } else {
                     return false; // 找到了但是密码错了
@@ -52,14 +52,16 @@ public class userBank {
         return false; // 没有找到用户名 两者是不是要分开处理
     }
 
+
     public boolean check_user(String name) {
-        for (String[] row : this.users_data) {
-            if (Objects.equals(name,row[0])) { // TODO:The order of name and pwd is to be decide
+        for (String[] row : users_data) {
+            if (Objects.equals(name, row[0])) {
                 return false;
             }
         }
         return true; // 没有找到用户名
     }
+
 
     public int write_user(String name, String pwd) throws IOException {
         for (int i = 0; i < this.users_data.size(); i++) {

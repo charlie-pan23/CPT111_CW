@@ -13,16 +13,21 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import xjtlu.cpt111.assignment.quiz.utils.userBank;
 
 import java.io.IOException;
 
-public class  Main extends Application {
-    private Stage Stage0; // 初始化界面Stage0
-    private Stage Stage1; // 登录注册界面Stage1
-    private Stage Stage2; // 操作选择界面Stage2
+import xjtlu.cpt111.assignment.quiz.utils.userBank;
+import static xjtlu.cpt111.assignment.quiz.utils.InfoDialog.show_Info;
+
+public class Main extends Application {
+    private Stage Stage0; // 初始化界面 Stage0
+    private Stage Stage1; // 登录注册界面 Stage1
+    private Stage Stage2; // 操作选择界面 Stage2
     private Stage Stage_Login; //登录界面
     private Stage Stage_Register; //注册界面
+    private Stage Stage_Quiz; //quiz界面
+    private Stage Stage_Dashboard; //dashboard 界面
+    private Stage Stage_Leaderboard; // leaderboard 界面
 
     String[] topiclist = {"cs", "ee", "english", "mathematics"};
     userBank user;
@@ -31,7 +36,7 @@ public class  Main extends Application {
         try {
             user = new userBank(topiclist);
         } catch (IOException e) {
-            show_Error(e.getMessage());
+            show_Info("Error", e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -104,41 +109,41 @@ public class  Main extends Application {
         System.out.println("Login button clicked");
         // 执行登录操作
 
-            Stage_Login = new Stage();
-            Stage_Login.setTitle("Login");
-            Stage_Login.setResizable(false);
-            Stage_Login.setWidth(480);
-            Stage_Login.setHeight(270);
+        Stage_Login = new Stage();
+        Stage_Login.setTitle("Login");
+        Stage_Login.setResizable(false);
+        Stage_Login.setWidth(480);
+        Stage_Login.setHeight(270);
 
-            GridPane grid = new GridPane();
-            grid.setPadding(new Insets(10));
-            grid.setVgap(10);
-            grid.setHgap(10);
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setVgap(10);
+        grid.setHgap(10);
 
-            Label userLabel = new Label("Username:");
-            grid.add(userLabel, 0, 0);
-            TextField usernameField = new TextField();
-            grid.add(usernameField, 1, 0);
+        Label userLabel = new Label("Username:");
+        grid.add(userLabel, 0, 0);
+        TextField usernameField = new TextField();
+        grid.add(usernameField, 1, 0);
 
-            Label passLabel = new Label("Password:");
-            grid.add(passLabel, 0, 1);
-            PasswordField passwordField = new PasswordField();
-            grid.add(passwordField, 1, 1);
+        Label passLabel = new Label("Password:");
+        grid.add(passLabel, 0, 1);
+        PasswordField passwordField = new PasswordField();
+        grid.add(passwordField, 1, 1);
 
-            Button loginButton = new Button("Login");
-            loginButton.setOnAction(e -> {
-                String username = usernameField.getText();
-                String password = passwordField.getText();
-                if (user.check_user(username, password)) {
-                    show_Stage2();
-                    if (Stage_Login != null && Stage_Login.isShowing()) {
-                        Stage_Login.close();
-                    }
-                } else {
-                    show_Error("Username or Password is incorrect");
+        Button loginButton = new Button("Login");
+        loginButton.setOnAction(e -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            if (user.check_user(username, password)) {
+                show_Stage2();
+                if (Stage_Login != null && Stage_Login.isShowing()) {
+                    Stage_Login.close();
                 }
-            });
-            grid.add(loginButton, 1, 2);
+            } else {
+                show_Info("Error", "Username or Password is incorrect");
+            }
+        });
+        grid.add(loginButton, 1, 2);
 
         // 添加返回按钮
         Button returnButton = new Button("Return");
@@ -157,10 +162,6 @@ public class  Main extends Application {
             Stage1.hide(); // 隐藏Stage1
         }
 
-    }
-
-    private void show_Stage2() {
-        System.out.println("Stage2 shown");
     }
 
     private void Register() {
@@ -189,9 +190,9 @@ public class  Main extends Application {
             confirmButton.setOnAction(e -> {
                 String username = usernameField.getText();
                 if (username.length() < 4) {
-                    show_Error("Username must be longer than 4 letters!");
+                    show_Info("Warning", "Username must be longer than 4 letters!");
                 } else if (!user.check_user(username)) { // 假设check_user返回true如果用户名已存在
-                    show_Error("Username has been chosen!");
+                    show_Info("Error", "Username has been chosen!");
                 } else {
                     // 如果用户名检查通过，显示密码输入框
                     confirmButton.setDisable(true); // 禁用确认按钮
@@ -209,7 +210,7 @@ public class  Main extends Application {
                         String password = passwordField.getText();
                         String confirmPassword = confirmPasswordField.getText();
                         if (!password.equals(confirmPassword)) {
-                            show_Error("Passwords do not match!");
+                            show_Info("Error", "Passwords do not match!");
                         } else {
                             // 注册用户逻辑
                             try {
@@ -235,18 +236,51 @@ public class  Main extends Application {
             grid.add(confirmButton, 1, 2);
 
             // 添加返回按钮
-            Button returnButton = new Button("Return");
-            returnButton.setOnAction(e -> {
+            Button backButton = new Button("Back");
+            backButton.setOnAction(e -> {
                 Stage_Register.hide(); // 隐藏注册界面
                 Stage1.show(); // 显示上一个界面
             });
-            grid.add(returnButton, 1, 3); // 将返回按钮添加到布局中
+            grid.add(backButton, 1, 3); // 将返回按钮添加到布局中
 
             Scene scene = new Scene(grid);
             Stage_Register.setScene(scene);
         }
         Stage_Register.show();
 
+    }
+
+    private void show_Stage2() {
+        System.out.println("Stage2 shown");
+        if (Stage2 == null || !Stage2.isShowing()) {
+            Stage2 = new Stage();
+            Stage2.setTitle("Choose Operation");
+            Stage2.setResizable(false);
+            Stage2.setWidth(480);
+            Stage2.setHeight(270);
+
+            VBox layout = new VBox(10); // 使用VBox布局，间距为10
+            layout.setAlignment(Pos.CENTER); // 设置布局居中
+
+            // 添加按钮
+            Button attemptQuizButton = new Button("Attempt quiz");
+            Button myDashboardButton = new Button("My dashboard");
+            Button leaderBoardButton = new Button("Leader board");
+            Button backButton = new Button("Back");
+
+            // 为按钮添加事件处理器
+            backButton.setOnAction(e -> {
+                Stage2.hide(); // 隐藏Stage2
+                Stage1.show(); // 显示Stage1
+            });
+
+            // 将按钮添加到布局中
+            layout.getChildren().addAll(attemptQuizButton, myDashboardButton, leaderBoardButton, backButton);
+
+            Scene scene = new Scene(layout, 480, 270);
+            Stage2.setScene(scene);
+        }
+        Stage2.show();
     }
 
     private void Exit() {
@@ -264,23 +298,16 @@ public class  Main extends Application {
 
     }
 
-    private void show_Error(String message) {
-        Stage errorStage = new Stage();
-        errorStage.initStyle(StageStyle.UTILITY);
-        errorStage.setTitle("Error");
-        VBox vbox = new VBox(10, new Label(message));
-        vbox.setPadding(new Insets(10));
-        Scene scene = new Scene(vbox);
-        errorStage.setScene(scene);
-        errorStage.showAndWait();
+    private void Dash_Board() {
+        System.out.println("Dash_Board shown");
     }
 
-    private void Dash_Board(){
-
+    private void Leader_Board() {
+        System.out.println("Leader_Board shown");
     }
 
-    private void Leader_Board(){
-
+    private void Quiz(){
+        System.out.println("Quiz Entered");
     }
 
 }
