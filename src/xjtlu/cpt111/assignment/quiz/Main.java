@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import xjtlu.cpt111.assignment.quiz.models.Question;
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
 
 import static xjtlu.cpt111.assignment.quiz.utils.InfoDialog.show_Info;
@@ -29,8 +30,10 @@ public class Main extends Application {
     private Stage Stage_Topic; //topic choose 界面
     private Stage Stage_Dashboard; //dashboard 界面
     private Stage Stage_Leaderboard; // leaderboard 界面
-    private Stage Stage_Quiz; //quiz 界面
+    private Stage Stage_Quiz1; //quiz 准备界面
+    private Stage Stage_Quiz2; //quiz 界面
 
+    public String UserName = new String();
 
     String[] topiclist = {"cs", "ee", "english", "mathematics"};
     userBank user;
@@ -43,8 +46,6 @@ public class Main extends Application {
             throw new RuntimeException(e);
         }
     }
-
-    questionBank question;
 
 
     public static void main(String[] args) {
@@ -141,6 +142,7 @@ public class Main extends Application {
             String password = passwordField.getText();
             if (user.check_user(username, password)) {
                 show_Stage2();
+                UserName = username;
                 if (Stage_Login != null && Stage_Login.isShowing()) {
                     Stage_Login.close();
                 }
@@ -221,6 +223,7 @@ public class Main extends Application {
                             try {
                                 user.write_user(username, password); // 假设register方法注册用户
                             } catch (IOException ex) {
+                                show_Info("Error", ex.getMessage());
                                 throw new RuntimeException(ex);
                             }
                             show_Stage1(); // 注册成功后返回Stage1
@@ -270,7 +273,7 @@ public class Main extends Application {
             // 添加按钮
             Button chooseTopicButton = new Button("Choose quiz topic");
             Button myDashboardButton = new Button("My dashboard");
-            Button leaderBoardButton = new Button("Leader board");
+
             Button backButton = new Button("Back");
 
             // 为按钮添加事件处理器
@@ -284,10 +287,6 @@ public class Main extends Application {
                 Dash_Board();
             });
 
-            leaderBoardButton.setOnAction(e -> {
-                Stage_Login.hide();
-                Leader_Board();
-            });
 
             backButton.setOnAction(e -> {
                 Stage2.hide(); // 隐藏Stage2
@@ -295,7 +294,7 @@ public class Main extends Application {
             });
 
             // 将按钮添加到布局中
-            layout.getChildren().addAll(chooseTopicButton, myDashboardButton, leaderBoardButton, backButton);
+            layout.getChildren().addAll(chooseTopicButton, myDashboardButton, backButton);
 
             Scene scene = new Scene(layout, 480, 270);
             Stage2.setScene(scene);
@@ -306,7 +305,8 @@ public class Main extends Application {
 
     private void Dash_Board() {
         System.out.println("Dash_Board shown");
-        
+        System.out.println(user.read_user_score(UserName));
+
     }
 
     private void Leader_Board() {
@@ -383,12 +383,12 @@ public class Main extends Application {
 
     private void Start_quiz(String topic) {
         System.out.println("Start_quiz shown");
-        if (Stage_Quiz == null || !Stage_Quiz.isShowing()) {
-            Stage_Quiz = new Stage();
-            Stage_Quiz.setTitle("Start quiz");
-            Stage_Quiz.setResizable(false);
-            Stage_Quiz.setWidth(640);
-            Stage_Quiz.setHeight(360);
+        if (Stage_Quiz1 == null || !Stage_Quiz1.isShowing()) {
+            Stage_Quiz1 = new Stage();
+            Stage_Quiz1.setTitle("Start quiz");
+            Stage_Quiz1.setResizable(false);
+            Stage_Quiz1.setWidth(640);
+            Stage_Quiz1.setHeight(360);
 
             VBox layout = new VBox(20); // 使用VBox布局，间距为20
             layout.setAlignment(Pos.CENTER); // 设置布局居中
@@ -401,34 +401,50 @@ public class Main extends Application {
 
             // 添加按钮
             Button attemptQuizButton = new Button("Attempt Quiz");
+            Button leaderBoardButton = new Button("Leader board");
             Button backButton = new Button("Back");
 
             // 为按钮添加事件处理器
             attemptQuizButton.setOnAction(e -> {
-                // 处理开始测验的逻辑
                 System.out.println("Attempt Quiz button clicked");
-                // 可以在这里添加开始测验的代码
+                Stage_Quiz1.hide();
+                Quiz(topic);
+
             });
+
+            leaderBoardButton.setOnAction(e -> {
+                Stage_Login.hide();
+                Leader_Board();
+            });
+
             backButton.setOnAction(e -> {
-                // 处理返回的逻辑
                 System.out.println("Back button clicked");
-                Stage_Quiz.hide();
+                Stage_Quiz1.hide();
                 Stage_Topic.show();
 
             });
 
             // 将按钮添加到布局中
-            layout.getChildren().addAll(attemptQuizButton, backButton);
+            layout.getChildren().addAll(attemptQuizButton, leaderBoardButton, backButton);
 
             Scene scene = new Scene(layout);
-            Stage_Quiz.setScene(scene);
+            Stage_Quiz1.setScene(scene);
         }
-        Stage_Quiz.show();
+        Stage_Quiz1.show();
+    }
+
+    private void Quiz(String topic) {
+        System.out.println("Quiz shown");
+        questionBank qb = new questionBank();
+
+        Question[] computerScienceQuestions = questionBank.getSpecificTopic(qb.getAllQuestions(), topic);
+        for (Question question : computerScienceQuestions) {
+            System.out.println(question);
+        }
     }
 
     private void Exit() {
         System.out.println("Exit button clicked");
-        // 执行退出操作
         // 关闭所有打开的Stage
         if (Stage0 != null) Stage0.close();
         if (Stage1 != null) Stage1.close();
@@ -438,7 +454,8 @@ public class Main extends Application {
         if (Stage_Topic != null) Stage_Topic.close();
         if (Stage_Dashboard != null) Stage_Dashboard.close();
         if (Stage_Leaderboard != null) Stage_Leaderboard.close();
-        if (Stage_Quiz != null) Stage_Quiz.close();
+        if (Stage_Quiz1 != null) Stage_Quiz1.close();
+        if (Stage_Quiz2 != null) Stage_Quiz2.close();
         // 结束程序
         System.out.println("System exited");
         System.exit(0);
