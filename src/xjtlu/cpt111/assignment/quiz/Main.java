@@ -13,12 +13,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import xjtlu.cpt111.assignment.quiz.UI_utils.ButtonFactory;
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
 
 import java.io.IOException;
 
-public class Main extends Application {
+public class  Main extends Application {
     private Stage Stage0; // 初始化界面Stage0
     private Stage Stage1; // 登录注册界面Stage1
     private Stage Stage2; // 操作选择界面Stage2
@@ -32,7 +31,7 @@ public class Main extends Application {
         try {
             user = new userBank(topiclist);
         } catch (IOException e) {
-            showError(e.getMessage());
+            show_Error(e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -136,7 +135,7 @@ public class Main extends Application {
                         Stage_Login.close();
                     }
                 } else {
-                    showError("Username or Password is incorrect");
+                    show_Error("Username or Password is incorrect");
                 }
             });
             grid.add(loginButton, 1, 2);
@@ -190,9 +189,9 @@ public class Main extends Application {
             confirmButton.setOnAction(e -> {
                 String username = usernameField.getText();
                 if (username.length() < 4) {
-                    showError("Username must be longer than 4 letters!");
-                } else if (user.check_user(username)) { // 假设check_user返回true如果用户名已存在
-                    showError("Username has been chosen!");
+                    show_Error("Username must be longer than 4 letters!");
+                } else if (!user.check_user(username)) { // 假设check_user返回true如果用户名已存在
+                    show_Error("Username has been chosen!");
                 } else {
                     // 如果用户名检查通过，显示密码输入框
                     confirmButton.setDisable(true); // 禁用确认按钮
@@ -210,7 +209,7 @@ public class Main extends Application {
                         String password = passwordField.getText();
                         String confirmPassword = confirmPasswordField.getText();
                         if (!password.equals(confirmPassword)) {
-                            showError("Passwords do not match!");
+                            show_Error("Passwords do not match!");
                         } else {
                             // 注册用户逻辑
                             try {
@@ -265,7 +264,7 @@ public class Main extends Application {
 
     }
 
-    private void showError(String message) {
+    private void show_Error(String message) {
         Stage errorStage = new Stage();
         errorStage.initStyle(StageStyle.UTILITY);
         errorStage.setTitle("Error");
@@ -274,6 +273,14 @@ public class Main extends Application {
         Scene scene = new Scene(vbox);
         errorStage.setScene(scene);
         errorStage.showAndWait();
+    }
+
+    private void Dash_Board(){
+
+    }
+
+    private void Leader_Board(){
+
     }
 
 }

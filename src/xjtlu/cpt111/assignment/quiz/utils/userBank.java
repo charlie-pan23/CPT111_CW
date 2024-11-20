@@ -53,8 +53,8 @@ public class userBank {
     }
 
     public boolean check_user(String name) {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(name, this.users_data.get(i)[1])) { // TODO:The order of name and pwd is to be decide
+        for (String[] row : this.users_data) {
+            if (Objects.equals(name,row[0])) { // TODO:The order of name and pwd is to be decide
                 return false;
             }
         }
