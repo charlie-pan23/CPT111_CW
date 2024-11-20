@@ -12,11 +12,12 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+
 
 import java.io.IOException;
 
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
+
 import static xjtlu.cpt111.assignment.quiz.utils.InfoDialog.show_Info;
 
 public class Main extends Application {
@@ -25,9 +26,11 @@ public class Main extends Application {
     private Stage Stage2; // 操作选择界面 Stage2
     private Stage Stage_Login; //登录界面
     private Stage Stage_Register; //注册界面
-    private Stage Stage_Quiz; //quiz界面
+    private Stage Stage_Topic; //topic choose 界面
     private Stage Stage_Dashboard; //dashboard 界面
     private Stage Stage_Leaderboard; // leaderboard 界面
+    private Stage Stage_Quiz; //quiz 界面
+
 
     String[] topiclist = {"cs", "ee", "english", "mathematics"};
     userBank user;
@@ -40,6 +43,8 @@ public class Main extends Application {
             throw new RuntimeException(e);
         }
     }
+
+    questionBank question;
 
 
     public static void main(String[] args) {
@@ -263,24 +268,162 @@ public class Main extends Application {
             layout.setAlignment(Pos.CENTER); // 设置布局居中
 
             // 添加按钮
-            Button attemptQuizButton = new Button("Attempt quiz");
+            Button chooseTopicButton = new Button("Choose quiz topic");
             Button myDashboardButton = new Button("My dashboard");
             Button leaderBoardButton = new Button("Leader board");
             Button backButton = new Button("Back");
 
             // 为按钮添加事件处理器
+            chooseTopicButton.setOnAction(e -> {
+                Stage_Login.hide();
+                Choose_Topic();
+            });
+
+            myDashboardButton.setOnAction(e -> {
+                Stage_Login.hide();
+                Dash_Board();
+            });
+
+            leaderBoardButton.setOnAction(e -> {
+                Stage_Login.hide();
+                Leader_Board();
+            });
+
             backButton.setOnAction(e -> {
                 Stage2.hide(); // 隐藏Stage2
                 Stage1.show(); // 显示Stage1
             });
 
             // 将按钮添加到布局中
-            layout.getChildren().addAll(attemptQuizButton, myDashboardButton, leaderBoardButton, backButton);
+            layout.getChildren().addAll(chooseTopicButton, myDashboardButton, leaderBoardButton, backButton);
 
             Scene scene = new Scene(layout, 480, 270);
             Stage2.setScene(scene);
         }
         Stage2.show();
+    }
+
+
+    private void Dash_Board() {
+        System.out.println("Dash_Board shown");
+        
+    }
+
+    private void Leader_Board() {
+        System.out.println("Leader_Board shown");
+    }
+
+    private void Choose_Topic() {
+        System.out.println("Topic to be chosen");
+        if (Stage_Topic == null || !Stage_Topic.isShowing()) {
+            Stage_Topic = new Stage();
+            Stage_Topic.setTitle("Choose the topic of quiz");
+            Stage_Topic.setResizable(false);
+            Stage_Topic.setWidth(640);
+            Stage_Topic.setHeight(360);
+
+            GridPane layout = new GridPane();
+            layout.setPadding(new Insets(10));
+            layout.setVgap(10);
+            layout.setHgap(10);
+            layout.setAlignment(Pos.CENTER); //置于中间
+
+            // 添加按钮
+            Button computerScienceButton = new Button("Computer Science");
+            computerScienceButton.setPrefWidth(200);
+            Button electronicEngineeringButton = new Button("Electronic Engineering");
+            electronicEngineeringButton.setPrefWidth(200);
+            Button englishButton = new Button("English");
+            englishButton.setPrefWidth(200);
+            Button mathematicsButton = new Button("Mathematics");
+            mathematicsButton.setPrefWidth(200);
+            Button backButton = new Button("Back");
+
+            // 将按钮添加到布局中
+            layout.add(computerScienceButton, 0, 0);
+            layout.add(electronicEngineeringButton, 0, 1);
+            layout.add(englishButton, 0, 2);
+            layout.add(mathematicsButton, 0, 3);
+            layout.add(backButton, 2, 4);
+
+            // 为按钮添加事件处理器
+            backButton.setOnAction(e -> {
+                Stage_Topic.hide();
+                Stage2.show();
+            });
+            computerScienceButton.setOnAction(e -> {
+                System.out.println("Computer Science selected");
+                Stage_Topic.hide();
+                Start_quiz("Computer Science");
+            });
+            electronicEngineeringButton.setOnAction(e -> {
+                System.out.println("Electronic Engineering selected");
+                Stage_Topic.hide();
+                Start_quiz("Electronic Engineering");
+
+            });
+            englishButton.setOnAction(e -> {
+                System.out.println("English selected");
+                Stage_Topic.hide();
+                Start_quiz("English");
+
+            });
+            mathematicsButton.setOnAction(e -> {
+                System.out.println("Mathematics selected");
+                Stage_Topic.hide();
+                Start_quiz("Mathematics");
+
+            });
+
+            Scene scene = new Scene(layout);
+            Stage_Topic.setScene(scene);
+        }
+        Stage_Topic.show();
+    }
+
+    private void Start_quiz(String topic) {
+        System.out.println("Start_quiz shown");
+        if (Stage_Quiz == null || !Stage_Quiz.isShowing()) {
+            Stage_Quiz = new Stage();
+            Stage_Quiz.setTitle("Start quiz");
+            Stage_Quiz.setResizable(false);
+            Stage_Quiz.setWidth(640);
+            Stage_Quiz.setHeight(360);
+
+            VBox layout = new VBox(20); // 使用VBox布局，间距为20
+            layout.setAlignment(Pos.CENTER); // 设置布局居中
+            layout.setPadding(new Insets(20)); // 设置内边距
+
+            // 添加标题文本
+            Label topicLabel = new Label("You have chosen Topic: " + topic);
+            topicLabel.setStyle("-fx-font-size: 18; -fx-font-weight: bold;");
+            layout.getChildren().add(topicLabel);
+
+            // 添加按钮
+            Button attemptQuizButton = new Button("Attempt Quiz");
+            Button backButton = new Button("Back");
+
+            // 为按钮添加事件处理器
+            attemptQuizButton.setOnAction(e -> {
+                // 处理开始测验的逻辑
+                System.out.println("Attempt Quiz button clicked");
+                // 可以在这里添加开始测验的代码
+            });
+            backButton.setOnAction(e -> {
+                // 处理返回的逻辑
+                System.out.println("Back button clicked");
+                Stage_Quiz.hide();
+                Stage_Topic.show();
+
+            });
+
+            // 将按钮添加到布局中
+            layout.getChildren().addAll(attemptQuizButton, backButton);
+
+            Scene scene = new Scene(layout);
+            Stage_Quiz.setScene(scene);
+        }
+        Stage_Quiz.show();
     }
 
     private void Exit() {
@@ -292,22 +435,14 @@ public class Main extends Application {
         if (Stage2 != null) Stage2.close();
         if (Stage_Login != null) Stage_Login.close();
         if (Stage_Register != null) Stage_Register.close();
+        if (Stage_Topic != null) Stage_Topic.close();
+        if (Stage_Dashboard != null) Stage_Dashboard.close();
+        if (Stage_Leaderboard != null) Stage_Leaderboard.close();
+        if (Stage_Quiz != null) Stage_Quiz.close();
         // 结束程序
         System.out.println("System exited");
         System.exit(0);
 
-    }
-
-    private void Dash_Board() {
-        System.out.println("Dash_Board shown");
-    }
-
-    private void Leader_Board() {
-        System.out.println("Leader_Board shown");
-    }
-
-    private void Quiz(){
-        System.out.println("Quiz Entered");
     }
 
 }
