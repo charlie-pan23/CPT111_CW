@@ -40,9 +40,9 @@ public class userBank {
     }
 
     public boolean check_user(String name, String pwd) {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(name, this.users_data.get(i)[1])) { // TODO:The order of name and pwd is to be decide
-                if (Objects.equals(pwd, this.users_data.get(i)[2])) {
+        for (String[] row : users_data) {
+            if (Objects.equals(name, row[0])) {
+                if (Objects.equals(pwd, row[2])) {
                     return true;
                 } else {
                     return false; // 找到了但是密码错了
@@ -53,8 +53,8 @@ public class userBank {
     }
 
     public boolean check_user(String name) {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(name, this.users_data.get(i)[1])) { // TODO:The order of name and pwd is to be decide
+        for (String[] row : users_data) {
+            if (Objects.equals(name, row[0])) {
                 return false;
             }
         }
@@ -62,12 +62,12 @@ public class userBank {
     }
 
     public int write_user(String name, String pwd) throws IOException {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(this.users_data.get(i)[1], name)) {
+        for (String[] row : users_data) {
+            if (Objects.equals(row[0], name)) {
                 return 1; // 用户名重复
             }
         }
-        String[] temp = { name, pwd };
+        String[] temp = { name, name, pwd };
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
         this.users_data = refresh_data("users");
@@ -79,7 +79,7 @@ public class userBank {
         this.users_scores_data.add(temp);
         try {
             write_to_csv(this.users_scores_data, users_scores_csv_path);
-            refresh_data("users_scores");
+            this.users_data = refresh_data("users_scores");
         } catch (IOException e) {
             throw e;
         }
@@ -95,7 +95,7 @@ public class userBank {
             for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
                 if ((this.users_scores_data.get(i)[0] == name) && (this.users_scores_data.get(i)[1] == topic_list[j])) {
                     if (counter < 3) {
-                        temp[counter+1] = this.users_scores_data.get(i)[3];
+                        temp[counter + 1] = this.users_scores_data.get(i)[3];
                     } else {
                         break;
                     }

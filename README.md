@@ -5,13 +5,11 @@ and view their quiz scores on a personal dashboard. The primary aim is to create
 and interactive platform that enhances the learning experience through topic selection and question
 assignment.
 ## Existing problems
-- Does this CW need a GUI?
-  - JavaFX
 - Do we need to redirection the err info to a log file?
 - 关于错误处理 我现在是都传到主类里去了 我们可以写一个函数来专门处理报错
 ## Task distribution
-### Main --pmc
-- TBD
+### Main --pmc 
+- JavaFX
 ### Class userBank --lx
 - constructor   
   - usersBank(String[] topics_list)
