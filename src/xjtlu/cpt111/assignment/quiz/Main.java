@@ -153,12 +153,12 @@ public class Main extends Application {
         grid.add(loginButton, 1, 2);
 
         // 添加返回按钮
-        Button returnButton = new Button("Return");
-        returnButton.setOnAction(e -> {
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> {
             Stage_Login.hide(); // 隐藏登录界面
             Stage1.show(); // 显示注册登录界面
         });
-        grid.add(returnButton, 1, 3); // 将返回按钮添加到布局中
+        grid.add(backButton, 1, 3); // 将返回按钮添加到布局中
 
         Scene scene = new Scene(grid);
         Stage_Login.setScene(scene);
@@ -435,6 +435,7 @@ public class Main extends Application {
 
     private void Quiz(String topic) {
         System.out.println("Quiz shown");
+        Stage_Quiz2 = new Stage();
         questionBank qb = new questionBank();
 
         Question[] computerScienceQuestions = questionBank.getSpecificTopic(qb.getAllQuestions(), topic);
