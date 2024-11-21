@@ -1,9 +1,6 @@
 package xjtlu.cpt111.assignment.quiz;
-
-import xjtlu.cpt111.assignment.quiz.models.Difficulty;
 import xjtlu.cpt111.assignment.quiz.models.Question;
 
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class test {

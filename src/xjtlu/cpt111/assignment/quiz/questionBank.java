@@ -5,7 +5,6 @@ import xjtlu.cpt111.assignment.quiz.models.Question;
 import xjtlu.cpt111.assignment.quiz.utils.IOUtilities;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
