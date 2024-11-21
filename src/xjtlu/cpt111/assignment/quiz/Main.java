@@ -4,10 +4,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -15,6 +12,7 @@ import javafx.stage.Stage;
 
 
 import java.io.IOException;
+import java.util.Date;
 
 import xjtlu.cpt111.assignment.quiz.models.Question;
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
@@ -32,6 +30,7 @@ public class Main extends Application {
     private Stage Stage_Leaderboard; // leaderboard 界面
     private Stage Stage_Quiz1; //quiz 准备界面
     private Stage Stage_Quiz2; //quiz 界面
+    private Stage Stage_Score; //分数界面
 
     public String UserName = new String();
 
@@ -435,14 +434,137 @@ public class Main extends Application {
 
     private void Quiz(String topic) {
         System.out.println("Quiz shown");
-        Stage_Quiz2 = new Stage();
         questionBank qb = new questionBank();
+        var lambdaContext = new Object() {
+            int Index = 0;
+            int score = 0;
+        };
 
-        Question[] computerScienceQuestions = questionBank.getSpecificTopic(qb.getAllQuestions(), topic);
-        for (Question question : computerScienceQuestions) {
-            System.out.println(question);
+        // 取出特定问题
+        Question[] Questions = questionBank.getSpecificTopic(qb.getAllQuestions(), topic);
+
+        if (Stage_Quiz2 == null || !Stage_Quiz2.isShowing()) {
+            Stage_Quiz2 = new Stage();
+            Stage_Quiz2.setTitle("Start quiz");
+            Stage_Quiz2.setResizable(false);
+            Stage_Quiz2.setWidth(960);
+            Stage_Quiz2.setHeight(540);
+
+            TextArea questionArea = new TextArea();
+            questionArea.setEditable(false);
+            questionArea.setWrapText(true);
+            questionArea.setStyle("-fx-font-size: 16px;");
+
+            TextField answerField = new TextField();
+            answerField.setPromptText("Enter your answer (number only)");
+            answerField.setTextFormatter(new TextFormatter<>(change -> {
+                if (change.getControlNewText().matches("\\d*")) {
+                    return change;
+                }
+                return null;
+            }));
+
+            Button nextButton = new Button("Next");
+            Button quitButton = new Button("Quit");
+
+            VBox layout = new VBox(10);
+            layout.getChildren().addAll(questionArea, answerField, nextButton, quitButton);
+
+            Scene scene = new Scene(layout);
+            Stage_Quiz2.setScene(scene);
+
+            // 显示第一题
+            questionArea.setText(String.valueOf(Questions[lambdaContext.Index]));
+            Stage_Quiz2.show();
+
+            lambdaContext.Index = 1;
+            lambdaContext.score = 0;
+
+            nextButton.setOnAction(e -> {
+                boolean iftrue = false;
+                String userAnswer = answerField.getText();
+                if (lambdaContext.Index < Questions.length) {
+                    try {
+                        if (qb.isUserAnswerCorrect(userAnswer, Questions[lambdaContext.Index])) {
+                            lambdaContext.score++;
+                        }
+
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    lambdaContext.Index++;
+                }
+                if (lambdaContext.Index < Questions.length) {
+                    questionArea.clear();
+                    questionArea.setText(String.valueOf(Questions[lambdaContext.Index]));
+                    answerField.clear();
+                } else {
+                    Score_Page(topic, lambdaContext.score, Questions.length);
+                    Stage_Quiz2.close();
+
+//                    questionArea.clear();
+//                    questionArea.setText("Quiz completed!\n Your score is: " + lambdaContext.score);
+//                    nextButton.setDisable(true);
+//                    quitButton.setText("Close");
+//                    answerField.setDisable(true);
+                }
+            });
+//            quitButton.setOnAction(e -> Stage_Quiz2.close());
+
+
         }
     }
+
+    private void Score_Page(String topic, int score, int fullScore) {
+        if (Stage_Score == null || !Stage_Score.isShowing()) {
+            Stage_Score = new Stage();
+            Stage_Score.setTitle("Quiz Finished!");
+            Stage_Score.setResizable(false);
+            Stage_Score.setWidth(960);
+            Stage_Score.setHeight(540);
+
+            Date now = new Date();
+            try {
+                user.write_user_score(UserName, topic, now.toString(), score);
+                show_Info("Info","Your score has been saved!");
+                Stage_Quiz2.close();
+                Stage_Score.show();
+            } catch (IOException e) {
+                show_Info("Error", "Failed to save user score");
+                throw new RuntimeException(e);
+            }
+
+            TextArea scoreArea = new TextArea();
+            scoreArea.setEditable(false);
+            scoreArea.setWrapText(true);
+            scoreArea.setStyle("-fx-font-size: 16px;");
+
+            scoreArea.setText("Topic:" + topic + "\nQuiz completed!" + "\nYour score is: :" + score + " / " + fullScore);
+            Button closeButton = new Button("Close");
+            Button dashboardButton = new Button("My Dashboard");
+
+            GridPane layout = new GridPane();
+            layout.setPadding(new Insets(10));
+            layout.setVgap(10);
+            layout.setHgap(10);
+            layout.setAlignment(Pos.CENTER); //置于中间
+
+            layout.add(scoreArea, 0, 0);
+            layout.add(dashboardButton, 0, 1);
+            layout.add(closeButton, 0, 2);
+
+            closeButton.setOnAction(e -> {
+                Stage_Score.close();
+                Stage_Topic.show();
+            });
+            dashboardButton.setOnAction(e -> {
+                Dash_Board();
+            });
+            Stage_Score.show();
+        }
+    }
+
 
     private void Exit() {
         System.out.println("Exit button clicked");
@@ -457,6 +579,7 @@ public class Main extends Application {
         if (Stage_Leaderboard != null) Stage_Leaderboard.close();
         if (Stage_Quiz1 != null) Stage_Quiz1.close();
         if (Stage_Quiz2 != null) Stage_Quiz2.close();
+        if (Stage_Score != null) Stage_Score.close();
         // 结束程序
         System.out.println("System exited");
         System.exit(0);
