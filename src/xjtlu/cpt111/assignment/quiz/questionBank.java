@@ -1,5 +1,6 @@
 package xjtlu.cpt111.assignment.quiz;
 import xjtlu.cpt111.assignment.quiz.models.Difficulty;
+import xjtlu.cpt111.assignment.quiz.models.Option;
 import xjtlu.cpt111.assignment.quiz.models.Question;
 import xjtlu.cpt111.assignment.quiz.utils.IOUtilities;
 
@@ -82,7 +83,7 @@ public class questionBank {
         return topics;
     }
 
-    public static Question[] getQuestions(String topic, int questionNum) {
+    public Question[] getQuestions(String topic, int questionNum) {
         questionBank questionBank = new questionBank();
         Question[] allQuestions = questionBank.getAllQuestions();
         Question[] specificTopicQuestions = getSpecificTopic(allQuestions, topic);
@@ -122,6 +123,24 @@ public class questionBank {
 
 
             return finalQuestions;
+        }
+    }
+
+    public boolean isUserAnswerCorrect(String userAnswer, Question question) {
+        try {
+            //创建索引
+            int index = Integer.parseInt(userAnswer) - 1;
+            Option[] options = question.getOptions();
+            //确认输入
+            if (index < 0 || index >= options.length) {
+                System.out.println("Invalid answer. Please enter a number between 1 and " + options.length);
+                throw new RuntimeException("Invalid answer.");
+            }
+            // 检查用户选择的选项是否正确
+            return options[index].isCorrectAnswer();
+        //抛出错误
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
     }
 }
