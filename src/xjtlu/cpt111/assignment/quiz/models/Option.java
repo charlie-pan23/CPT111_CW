@@ -85,8 +85,9 @@ public class Option {
      */
     @Override
     public String toString() {
-        return answer + (isCorrectAnswer ? " (Correct)" : "");
+        return answer;
     }
+//     + (isCorrectAnswer ? " (Correct)" : "")
 
     /**
      * A string representation of the option with a prefix.

@@ -13,12 +13,15 @@ assignment.
 ### Main --pmc
 - TBD
 ### Class userBank --lx
+- constructor   
+  - usersBank(String[] topics_list)
 - Method
   - check_user(str name, str pwd) -> bool
+  - check_user(str name) -> bool 该用户名是否存在
   - write_user(str name, str pwd) -> int
   - write_user_score(str name, str topic, double score) 
-  - read_user_score() -> str[][]
-  - read_topic_score() -> str[][]
+  - read_user_score() -> ArrayList\<String[]\>
+  - read_topic_score() -> ArrayList\<String[]\>
 ### Class questionBank --cfy
 - constructor   
 - Method
