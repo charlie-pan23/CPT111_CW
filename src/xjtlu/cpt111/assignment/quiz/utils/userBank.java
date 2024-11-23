@@ -64,12 +64,12 @@ public class userBank {
 
 
     public int write_user(String name, String pwd) throws IOException {
-        for (int i = 0; i < this.users_data.size(); i++) {
-            if (Objects.equals(this.users_data.get(i)[1], name)) {
-                return 1; // 用户名重复
-            }
-        }
-        String[] temp = {name, pwd};
+//        for (int i = 0; i < this.users_data.size(); i++) {
+//            if (Objects.equals(this.users_data.get(i)[1], name)) {
+//                return 1; // 用户名重复
+//            }
+//        }
+        String[] temp = {name, name, pwd};
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
         this.users_data = refresh_data("users");
@@ -95,11 +95,12 @@ public class userBank {
             String[] temp = new String[4];
             temp[0] = topic_list[j];
             for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
-                if ((this.users_scores_data.get(i)[0] == name) && (this.users_scores_data.get(i)[1] == topic_list[j])) {
+                if ((Objects.equals(this.users_scores_data.get(i)[0], name)) && (Objects.equals(this.users_scores_data.get(i)[1], topic_list[j]))) {
                     if (counter < 3) {
                         temp[counter + 1] = this.users_scores_data.get(i)[3];
-                    } else {
-                        break;
+                        counter++;
+//                    } else {
+//                        break;
                     }
                 }
             }
@@ -114,12 +115,12 @@ public class userBank {
             String[] score = new String[]{"0", "0", "0", "0"};
             topics_score.add(score);
         }
-        for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
+        for (String[] row : this.users_scores_data) {
             for (int j = 0; j < topic_list.length; j++) {
-                if (Objects.equals(this.users_scores_data.get(i)[1], topic_list[j])) {
-                    if (Double.parseDouble(this.users_scores_data.get(i)[3]) >= Double
-                            .parseDouble(topics_score.get(j)[3])) { // 大于等于可以取两个相同成绩中较早达成的一个
-                        topics_score.set(j, this.users_scores_data.get(i));
+                if (Objects.equals(row[1], topic_list[j])) {
+                    if (Double.parseDouble(row[3]) >Double
+                            .parseDouble(topics_score.get(j)[3])) {
+                        topics_score.set(j, row);
                     }
                     break;
                 }

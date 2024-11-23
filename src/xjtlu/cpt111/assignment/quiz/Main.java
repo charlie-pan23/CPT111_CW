@@ -1,10 +1,14 @@
 package xjtlu.cpt111.assignment.quiz;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -12,6 +16,7 @@ import javafx.stage.Stage;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import xjtlu.cpt111.assignment.quiz.models.Question;
@@ -34,7 +39,7 @@ public class Main extends Application {
 
     public String UserName = new String();
 
-    String[] topiclist = {"cs", "ee", "english", "mathematics"};
+    String[] topiclist = {"Computer Science", "Electronic Engineering", "English", "Mathematics"};
     userBank user;
 
     {
@@ -195,8 +200,8 @@ public class Main extends Application {
             Button confirmButton = new Button("Confirm");
             confirmButton.setOnAction(e -> {
                 String username = usernameField.getText();
-                if (username.length() < 4) {
-                    show_Info("Warning", "Username must be longer than 4 letters!");
+                if (username.length() < 2) {
+                    show_Info("Warning", "Username must be longer than 2 letters!");
                 } else if (!user.check_user(username)) { // 假设check_user返回true如果用户名已存在
                     show_Info("Error", "Username has been chosen!");
                 } else {
@@ -221,6 +226,7 @@ public class Main extends Application {
                             // 注册用户逻辑
                             try {
                                 user.write_user(username, password); // 假设register方法注册用户
+                                show_Info("Success", "User successfully registered!");
                             } catch (IOException ex) {
                                 show_Info("Error", ex.getMessage());
                                 throw new RuntimeException(ex);
@@ -230,8 +236,9 @@ public class Main extends Application {
                         }
                     });
                     grid.add(registerButton, 1, 3); // 添加注册按钮
-                    Scene scene = new Scene(grid);
-                    Stage_Register.setScene(scene);
+//                    Scene scene = new Scene(grid);
+//                    Stage_Register.setScene(null);
+//                    Stage_Register.setScene(scene);
                     Stage_Register.show();
 
                     // 隐藏Stage1
@@ -251,6 +258,7 @@ public class Main extends Application {
             grid.add(backButton, 1, 3); // 将返回按钮添加到布局中
 
             Scene scene = new Scene(grid);
+//            Stage_Register.setScene(null);
             Stage_Register.setScene(scene);
         }
         Stage_Register.show();
@@ -304,12 +312,95 @@ public class Main extends Application {
 
     private void Dash_Board() {
         System.out.println("Dash_Board shown");
-        System.out.println(user.read_user_score(UserName));
+//        System.out.println(user.read_user_score(UserName));
+        ArrayList<String[]> score_board =user.read_user_score(UserName);
+
+
+        // 初始化Stage
+        if (Stage_Leaderboard == null || !Stage_Leaderboard.isShowing()) {
+            Stage_Leaderboard = new Stage();
+            Stage_Leaderboard.setTitle("Choose the topic of quiz");
+            Stage_Leaderboard.setResizable(false);
+            Stage_Leaderboard.setWidth(640);
+            Stage_Leaderboard.setHeight(360);
+
+            GridPane layout = new GridPane();
+            layout.setPadding(new Insets(10));
+            layout.setVgap(10);
+            layout.setHgap(10);
+            layout.setAlignment(Pos.CENTER);
+
+
+            Label[][] Label = new Label[4][4];
+//            for (int i = 0; i < 4; i++) {
+//                Label[0][i] = new Label(topiclist[i]);
+//            }
+
+            for(int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    Label[i][j]=new Label(score_board.get(i)[j]);
+                    System.out.println(score_board.get(i)[j]);
+                }
+            }
+
+
+            for(int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    layout.add(Label[i][j], i, j);
+                }
+            }
+            Scene scene = new Scene(layout);
+            Stage_Leaderboard.setScene(scene);
+            Stage_Leaderboard.show();
+
+        }
 
     }
 
     private void Leader_Board() {
         System.out.println("Leader_Board shown");
+
+        ArrayList<String[]> score_board =user.read_topic_score();
+
+
+        // 初始化Stage
+        if (Stage_Dashboard == null || !Stage_Dashboard.isShowing()) {
+            Stage_Dashboard = new Stage();
+            Stage_Dashboard.setTitle("Choose the topic of quiz");
+            Stage_Dashboard.setResizable(false);
+            Stage_Dashboard.setWidth(640);
+            Stage_Dashboard.setHeight(360);
+
+            GridPane layout = new GridPane();
+            layout.setPadding(new Insets(10));
+            layout.setVgap(10);
+            layout.setHgap(10);
+            layout.setAlignment(Pos.CENTER);
+
+
+            Label[][] Label = new Label[4][4];
+//            for (int i = 0; i < 4; i++) {
+//                Label[0][i] = new Label(topiclist[i]);
+//            }
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    Label[i][j] = new Label(score_board.get(i)[j]);
+                    System.out.println(score_board.get(i)[j]);
+                }
+            }
+
+
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 4; j++) {
+                    layout.add(Label[i][j], i, j);
+                }
+            }
+            Scene scene = new Scene(layout);
+            Stage_Dashboard.setScene(scene);
+            Stage_Dashboard.show();
+        }
+
     }
 
     private void Choose_Topic() {
@@ -441,7 +532,7 @@ public class Main extends Application {
         };
 
         // 取出特定问题
-        Question[] Questions = questionBank.getSpecificTopic(qb.getAllQuestions(), topic);
+        Question[] Questions = qb.getQuestions(topic , 8);
 
         if (Stage_Quiz2 == null || !Stage_Quiz2.isShowing()) {
             Stage_Quiz2 = new Stage();
@@ -481,7 +572,6 @@ public class Main extends Application {
             lambdaContext.score = 0;
 
             nextButton.setOnAction(e -> {
-                boolean iftrue = false;
                 String userAnswer = answerField.getText();
                 if (lambdaContext.Index < Questions.length) {
                     try {
@@ -502,15 +592,9 @@ public class Main extends Application {
                 } else {
                     Score_Page(topic, lambdaContext.score, Questions.length);
                     Stage_Quiz2.close();
-
-//                    questionArea.clear();
-//                    questionArea.setText("Quiz completed!\n Your score is: " + lambdaContext.score);
-//                    nextButton.setDisable(true);
-//                    quitButton.setText("Close");
-//                    answerField.setDisable(true);
                 }
             });
-//            quitButton.setOnAction(e -> Stage_Quiz2.close());
+
 
 
         }
