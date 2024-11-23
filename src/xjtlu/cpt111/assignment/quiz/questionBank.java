@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
 public class questionBank {
     private static List<Integer> indexes = new ArrayList<>();
     private static int index = 0;
@@ -17,7 +16,7 @@ public class questionBank {
 
     public questionBank() {
         //构造读取
-        String directoryPath = "resources/questionsBank/";
+        String directoryPath = "resources/questionsBank";
         try {
             allQuestions = IOUtilities.readQuestions(directoryPath);
             extractTopics();
@@ -126,21 +125,37 @@ public class questionBank {
         }
     }
 
+    // 检查用户答案是否正确
     public boolean isUserAnswerCorrect(String userAnswer, Question question) {
-        try {
-            //创建索引
-            int index = Integer.parseInt(userAnswer) - 1;
-            Option[] options = question.getOptions();
-            //确认输入
-            if (index < 0 || index >= options.length) {
-                System.out.println("Invalid answer. Please enter a number between 1 and " + options.length);
-                throw new RuntimeException("Invalid answer.");
+        // 假设用户的答案是以逗号分隔的字符串，例如 "1,3"
+        String[] userAnswerArray = userAnswer.split(",");
+        List<Integer> userAnswerList = new ArrayList<>();
+        for (String s : userAnswerArray) {
+            try {
+                userAnswerList.add(Integer.parseInt(s.trim()) - 1);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter numbers only.");
+                return false;
             }
-            // 检查用户选择的选项是否正确
-            return options[index].isCorrectAnswer();
-        //抛出错误
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
         }
+
+        Option[] options = question.getOptions();
+        for (Integer index : userAnswerList) {
+            if (index < 0 || index >= options.length) {
+                return false; // 用户输入的索引不在选项范围内
+            }
+            if (!options[index].isCorrectAnswer()) {
+                return false; // 用户选择的选项中有一个不是正确答案
+            }
+        }
+
+        // 检查是否选择了所有正确答案
+        for (int i = 0; i < options.length; i++) {
+            if (options[i].isCorrectAnswer() && !userAnswerList.contains(i)) {
+                return false; // 存在正确答案未被选择
+            }
+        }
+
+        return true; // 所有用户选择的答案都是正确的
     }
 }
