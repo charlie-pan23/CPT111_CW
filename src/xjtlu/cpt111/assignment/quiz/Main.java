@@ -517,52 +517,46 @@ public class Main extends Application {
     }
 
     private void Score_Page(String topic, int score, int fullScore) {
-        if (Stage_Score == null || !Stage_Score.isShowing()) {
-            Stage_Score = new Stage();
-            Stage_Score.setTitle("Quiz Finished!");
-            Stage_Score.setResizable(false);
-            Stage_Score.setWidth(960);
-            Stage_Score.setHeight(540);
+        Date now = new Date();
+        Stage_Score = new Stage(); // 将 Stage_Score 的初始化移到方法的开始
+        Stage_Score.setTitle("Quiz Finished!");
 
-            Date now = new Date();
-            try {
-                user.write_user_score(UserName, topic, now.toString(), score);
-                show_Info("Info","Your score has been saved!");
-                Stage_Quiz2.close();
-                Stage_Score.show();
-            } catch (IOException e) {
-                show_Info("Error", "Failed to save user score");
-                throw new RuntimeException(e);
-            }
-
-            TextArea scoreArea = new TextArea();
-            scoreArea.setEditable(false);
-            scoreArea.setWrapText(true);
-            scoreArea.setStyle("-fx-font-size: 16px;");
-
-            scoreArea.setText("Topic:" + topic + "\nQuiz completed!" + "\nYour score is: :" + score + " / " + fullScore);
-            Button closeButton = new Button("Close");
-            Button dashboardButton = new Button("My Dashboard");
-
-            GridPane layout = new GridPane();
-            layout.setPadding(new Insets(10));
-            layout.setVgap(10);
-            layout.setHgap(10);
-            layout.setAlignment(Pos.CENTER); //置于中间
-
-            layout.add(scoreArea, 0, 0);
-            layout.add(dashboardButton, 0, 1);
-            layout.add(closeButton, 0, 2);
-
-            closeButton.setOnAction(e -> {
-                Stage_Score.close();
-                Stage_Topic.show();
-            });
-            dashboardButton.setOnAction(e -> {
-                Dash_Board();
-            });
-            Stage_Score.show();
+        try {
+            user.write_user_score(UserName, topic, now.toString(), score);
+            show_Info("Info", "Your score has been saved!");
+            Stage_Quiz2.close();
+            Stage_Score.show(); // 确保在 Stage_Score 初始化后调用 show 方法
+        } catch (IOException e) {
+            show_Info("Error", "Failed to save user score");
+            throw new RuntimeException(e);
         }
+
+        Stage_Score.setWidth(960);
+        Stage_Score.setHeight(540);
+        Button closeButton = new Button("Close");
+        Button dashboardButton = new Button("My Dashboard");
+
+        closeButton.setOnAction(e -> {
+            Stage_Score.close();
+            Stage_Topic.show();
+        });
+        dashboardButton.setOnAction(e -> {
+            Dash_Board();
+        });
+
+        TextArea scoreArea = new TextArea();
+        scoreArea.setEditable(false);
+        scoreArea.setWrapText(true);
+        scoreArea.setStyle("-fx-font-size: 16px;");
+
+        scoreArea.setText("Topic: " + topic + "\nQuiz completed!" + "\nYour score is: " + score + " / " + fullScore);
+        VBox layout = new VBox(10);
+
+        layout.getChildren().addAll(scoreArea, closeButton, dashboardButton);
+
+        Scene scene = new Scene(layout);
+        Stage_Score.setScene(scene);
+        Stage_Score.show(); // 现在 Stage_Score 已经被初始化，可以安全调用 show 方法
     }
 
 
