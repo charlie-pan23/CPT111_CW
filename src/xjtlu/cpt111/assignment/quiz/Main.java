@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -51,8 +52,12 @@ public class Main extends Application {
     private Stage Stage_Score;
 
     public String UserName = new String();
+    questionBank qb = new questionBank();
+    String[] topiclist = qb.getTopics();
 
-    String[] topiclist = {"Computer Science", "Electronic Engineering", "English", "Mathematics"};
+    int numofTopics = topiclist.length;
+
+
     userBank user;
 
     {
@@ -308,8 +313,11 @@ public class Main extends Application {
 
             // add items
             Button chooseTopicButton = new Button("Choose quiz topic");
+            chooseTopicButton.setPrefWidth(200);
             Button myDashboardButton = new Button("My dashboard");
+            myDashboardButton.setPrefWidth(200);
             Button leaderBoardButton = new Button("Leader board");
+            leaderBoardButton.setPrefWidth(200);
             Button backButton = new Button("Back");
 
             chooseTopicButton.setOnAction(e -> {
@@ -356,14 +364,14 @@ public class Main extends Application {
             layout.setAlignment(Pos.CENTER);
 
             // table is hard to use, so we use label for the same function
-            Label[][] Label = new Label[4][4];
+            Label[][] Label = new Label[numofTopics][4];
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < numofTopics; i++) {
                 for (int j = 0; j < 4; j++) {
                     Label[i][j] = new Label(score_board.get(i)[j]);
                 }
             }
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < numofTopics; i++) {
                 for (int j = 0; j < 4; j++) {
                     layout.add(Label[i][j], i, j);
                 }
@@ -389,16 +397,15 @@ public class Main extends Application {
             layout.setHgap(10);
             layout.setAlignment(Pos.CENTER);
 
-            Label[][] Label = new Label[4][4];
+            Label[][] Label = new Label[numofTopics][4];
 
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < numofTopics; i++) {
                 for (int j = 0; j < 4; j++) {
                     Label[i][j] = new Label(score_board.get(i)[j]);
                 }
             }
 
-
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < numofTopics; i++) {
                 for (int j = 0; j < 4; j++) {
                     layout.add(Label[i][j], i, j);
                 }
@@ -419,55 +426,71 @@ public class Main extends Application {
             Stage_Topic.setWidth(640);
             Stage_Topic.setHeight(360);
 
-            GridPane layout = new GridPane();
+            VBox layout = new VBox(10);
             layout.setPadding(new Insets(10));
-            layout.setVgap(10);
-            layout.setHgap(10);
             layout.setAlignment(Pos.CENTER);
 
-            // Place different topics
-            Button computerScienceButton = new Button(topiclist[0]);
-            computerScienceButton.setPrefWidth(200);
-            Button electronicEngineeringButton = new Button(topiclist[1]);
-            electronicEngineeringButton.setPrefWidth(200);
-            Button englishButton = new Button(topiclist[2]);
-            englishButton.setPrefWidth(200);
-            Button mathematicsButton = new Button(topiclist[3]);
-            mathematicsButton.setPrefWidth(200);
+//            // Place different topics
+//            Button computerScienceButton = new Button(topiclist[0]);
+//            computerScienceButton.setPrefWidth(200);
+//            Button electronicEngineeringButton = new Button(topiclist[1]);
+//            electronicEngineeringButton.setPrefWidth(200);
+//            Button englishButton = new Button(topiclist[2]);
+//            englishButton.setPrefWidth(200);
+//            Button mathematicsButton = new Button(topiclist[3]);
+//            mathematicsButton.setPrefWidth(200);
+
+//            layout.add(computerScienceButton, 0, 0);
+//            layout.add(electronicEngineeringButton, 0, 1);
+//            layout.add(englishButton, 0, 2);
+//            layout.add(mathematicsButton, 0, 3);
+//            layout.add(backButton, 2, 4);
+//
+//            backButton.setOnAction(e -> {
+//                Stage_Topic.hide();
+//                Stage2.show();
+//            });
+//            computerScienceButton.setOnAction(e -> {
+//                System.out.println("Computer Science selected");
+//                Stage_Topic.hide();
+//                Start_quiz("Computer Science");
+//            });
+//            electronicEngineeringButton.setOnAction(e -> {
+//                System.out.println("Electronic Engineering selected");
+//                Stage_Topic.hide();
+//                Start_quiz("Electronic Engineering");
+//
+//            });
+//            englishButton.setOnAction(e -> {
+//                System.out.println("English selected");
+//                Stage_Topic.hide();
+//                Start_quiz("English");
+//
+//            });
+//            mathematicsButton.setOnAction(e -> {
+//                System.out.println("Mathematics selected");
+//                Stage_Topic.hide();
+//                Start_quiz("Mathematics");
+//
+//            });
+
+            for (int i = 0; i < numofTopics; i++) {
+                Button topicButton = new Button(topiclist[i]);
+                topicButton.setPrefWidth(200);
+                layout.getChildren().add(topicButton);
+                String topic = topiclist[i];
+                topicButton.setOnAction(e -> {
+                    System.out.println(topic+" selected");
+                    Stage_Topic.hide();
+                    Start_quiz(topic);
+                });
+            }
+
             Button backButton = new Button("Back");
-
-            layout.add(computerScienceButton, 0, 0);
-            layout.add(electronicEngineeringButton, 0, 1);
-            layout.add(englishButton, 0, 2);
-            layout.add(mathematicsButton, 0, 3);
-            layout.add(backButton, 2, 4);
-
+            layout.getChildren().add(backButton);
             backButton.setOnAction(e -> {
                 Stage_Topic.hide();
                 Stage2.show();
-            });
-            computerScienceButton.setOnAction(e -> {
-                System.out.println("Computer Science selected");
-                Stage_Topic.hide();
-                Start_quiz("Computer Science");
-            });
-            electronicEngineeringButton.setOnAction(e -> {
-                System.out.println("Electronic Engineering selected");
-                Stage_Topic.hide();
-                Start_quiz("Electronic Engineering");
-
-            });
-            englishButton.setOnAction(e -> {
-                System.out.println("English selected");
-                Stage_Topic.hide();
-                Start_quiz("English");
-
-            });
-            mathematicsButton.setOnAction(e -> {
-                System.out.println("Mathematics selected");
-                Stage_Topic.hide();
-                Start_quiz("Mathematics");
-
             });
 
             Scene scene = new Scene(layout);
@@ -517,7 +540,7 @@ public class Main extends Application {
 
     private void Quiz(String topic) {
         System.out.println("Quiz shown");
-        questionBank qb = new questionBank();
+
         var lambdaContext = new Object() {
             int Index = 0;  // number of current question
             int score = 0;  // to store score
@@ -543,7 +566,7 @@ public class Main extends Application {
             answerField.setPromptText("Enter your answer (number only)");
             // numbers are only allowed, avoid weird input text
             answerField.setTextFormatter(new TextFormatter<>(change -> {
-                if (change.getControlNewText().matches("\\d*")) {
+                if (change.getControlNewText().matches("\\d?")) {
                     return change;
                 }
                 return null;
@@ -553,6 +576,7 @@ public class Main extends Application {
             Button quitButton = new Button("Quit");
 
             VBox layout = new VBox(10);
+            layout.setAlignment(Pos.CENTER);
             layout.getChildren().addAll(questionArea, answerField, nextButton, quitButton);
 
             Scene scene = new Scene(layout);
@@ -567,7 +591,7 @@ public class Main extends Application {
 
             nextButton.setOnAction(e -> {
                 String userAnswer = answerField.getText();
-                if (!userAnswer.equals("")) {
+                if (!userAnswer.isEmpty()) {
                     StringBuilder sendAnswer = new StringBuilder();
                     if (lambdaContext.Index < Questions.length) {
                         try {
@@ -595,6 +619,14 @@ public class Main extends Application {
                     }
                 } else {
                     show_Info("Notice", "The answer is empty!");
+                }
+            });
+
+            // when press ENTER equals to click nextButton
+            answerField.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    nextButton.fire(); // 触发nextButton的事件
+                    event.consume(); // 消费事件，防止进一步传播
                 }
             });
 
@@ -648,7 +680,7 @@ public class Main extends Application {
 
         scoreArea.setText("Topic: " + topic + "\nQuiz completed!" + "\nYour score is: " + score + " / " + fullScore);
         VBox layout = new VBox(10);
-
+        layout.setAlignment(Pos.CENTER);
         layout.getChildren().addAll(scoreArea, dashboardButton, closeButton, exitButton);
 
         Scene scene = new Scene(layout);
