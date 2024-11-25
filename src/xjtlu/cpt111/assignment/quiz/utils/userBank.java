@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class userBank {
-    private static final String users_csv_path = "./resources/users.csv";// TODO:
-    private static final String users_scores_csv_path = "./resources/users_scores.csv";// TODO:
+    private static final String users_csv_path = "./resources/users.csv";
+    private static final String users_scores_csv_path = "./resources/users_scores.csv";
     private ArrayList<String[]> users_data;
     private ArrayList<String[]> users_scores_data;
-    private String[] topic_list = {"cs", "ee", "english", "mathematics"};
+    private String[] topic_list = {"Computer Science", "Electronic Engineering", "English", "Mathematics"};
 
     public userBank(String[] topic_list_new) throws IOException {
         this.topic_list = topic_list_new;
@@ -32,8 +32,10 @@ public class userBank {
         try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] row = line.split(",");
-                temp.add(row);
+                if(!line.trim().isEmpty()) {
+                    String[] row = line.split(",");
+                    temp.add(row);
+                }
             }
             return temp;
         }
@@ -78,23 +80,19 @@ public class userBank {
     public void write_user_score(String name, String topic, String finished_time, double score) throws IOException {
         String[] temp = {name, topic, finished_time, "" + score};
         this.users_scores_data.add(temp);
-        try {
-            write_to_csv(this.users_scores_data, users_scores_csv_path);
-            this.users_data = refresh_data("users_scores");
-        } catch (IOException e) {
-            throw e;
-        }
-        return;// TODO:这里似乎不会有错 直接return了
+        write_to_csv(this.users_scores_data, users_scores_csv_path);
+        this.users_data = refresh_data("users_scores");
+        return;
     }
 
     public ArrayList<String[]> read_user_score(String name) {
         ArrayList<String[]> user_scores = new ArrayList<String[]>();
-        for (int j = 0; j < topic_list.length; j++) {
+        for (String s : topic_list) {
             int counter = 0;
             String[] temp = new String[4];
-            temp[0] = topic_list[j];
+            temp[0] = s;
             for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
-                if ((Objects.equals(this.users_scores_data.get(i)[0], name)) && (Objects.equals(this.users_scores_data.get(i)[1], topic_list[j]))) {
+                if ((Objects.equals(this.users_scores_data.get(i)[0], name)) && (Objects.equals(this.users_scores_data.get(i)[1], s))) {
                     if (counter < 3) {
                         temp[counter + 1] = this.users_scores_data.get(i)[3];
                         counter++;
@@ -139,8 +137,6 @@ public class userBank {
                 }
                 writer.newLine(); // 换行
             }
-        } catch (IOException e) {
-            throw e;
         }
     }
 
@@ -152,8 +148,6 @@ public class userBank {
             path = users_csv_path;
         } else if (Objects.equals(type, "users_scores")) {
             path = users_scores_csv_path;
-        } else {
-            System.exit(1);// TODO:
         }
         while (retries < maxRetries) {
             try {
