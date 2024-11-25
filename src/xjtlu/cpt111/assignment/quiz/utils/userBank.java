@@ -19,12 +19,8 @@ public class userBank {
 
     public userBank(String[] topic_list_new) throws IOException {
         this.topic_list = topic_list_new;
-        try {
-            this.users_data = refresh_data("users");
-            this.users_scores_data = refresh_data("users_scores");
-        } catch (IOException e) {
-            throw e; // or use System.exit(1);
-        }
+        this.users_data = refresh_data("users");
+        this.users_scores_data = refresh_data("users_scores");
     }
 
     private static ArrayList<String[]> read_csv(String filePath) throws IOException {
@@ -44,14 +40,11 @@ public class userBank {
     public boolean check_user(String name, String pwd) {
         for (String[] row : users_data) {
             if (Objects.equals(name, row[0])) {
-                if (Objects.equals(pwd, row[2])) {
-                    return true;
-                } else {
-                    return false; // 找到了但是密码错了
-                }
+                // username found
+                return Objects.equals(pwd, row[2]); // return the result of pwd comparison
             }
         }
-        return false; // 没有找到用户名 两者是不是要分开处理
+        return false; // username not found
     }
 
     public boolean check_user(String name) {
@@ -60,16 +53,11 @@ public class userBank {
                 return false;
             }
         }
-        return true; // 没有找到用户名
+        return true; // username not found
     }
 
 
     public int write_user(String name, String pwd) throws IOException {
-//        for (int i = 0; i < this.users_data.size(); i++) {
-//            if (Objects.equals(this.users_data.get(i)[1], name)) {
-//                return 1; // 用户名重复
-//            }
-//        }
         String[] temp = {name, name, pwd};
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
@@ -81,8 +69,7 @@ public class userBank {
         String[] temp = {name, topic, finished_time, "" + score};
         this.users_scores_data.add(temp);
         write_to_csv(this.users_scores_data, users_scores_csv_path);
-        this.users_data = refresh_data("users_scores");
-        return;
+        this.users_scores_data = refresh_data("users_scores");
     }
 
     public ArrayList<String[]> read_user_score(String name) {
@@ -96,8 +83,6 @@ public class userBank {
                     if (counter < 3) {
                         temp[counter + 1] = this.users_scores_data.get(i)[3];
                         counter++;
-//                    } else {
-//                        break;
                     }
                 }
             }
@@ -132,10 +117,10 @@ public class userBank {
                 for (int i = 0; i < row.length; i++) {
                     writer.write(row[i]);
                     if (i < row.length - 1) {
-                        writer.write(','); // CSV分隔符
+                        writer.write(','); // CSV separate symbol
                     }
                 }
-                writer.newLine(); // 换行
+                writer.newLine();
             }
         }
     }
@@ -152,7 +137,7 @@ public class userBank {
         while (retries < maxRetries) {
             try {
                 File file = new File(path);
-                if (!file.exists()) { // 若不存在就新建
+                if (!file.exists()) { // if this file not exits, then create a new file
                     file.createNewFile();
                 }
                 return read_csv(path);
@@ -166,6 +151,6 @@ public class userBank {
                 }
             }
         }
-        return new ArrayList<String[]>();// TODO:
+        return new ArrayList<String[]>();// if the method cannot read csv file, return empty arraylist
     }
 }
