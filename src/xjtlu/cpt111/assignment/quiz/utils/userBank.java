@@ -15,7 +15,7 @@ public class userBank {
     private static final String users_scores_csv_path = "./resources/users_scores.csv";// TODO:
     private ArrayList<String[]> users_data;
     private ArrayList<String[]> users_scores_data;
-    private String[] topic_list = { "cs", "ee", "english", "mathematics" };
+    private String[] topic_list = {"cs", "ee", "english", "mathematics"};
 
     public userBank(String[] topic_list_new) throws IOException {
         this.topic_list = topic_list_new;
@@ -61,13 +61,14 @@ public class userBank {
         return true; // 没有找到用户名
     }
 
+
     public int write_user(String name, String pwd) throws IOException {
-        for (String[] row : users_data) {
-            if (Objects.equals(row[0], name)) {
-                return 1; // 用户名重复
-            }
-        }
-        String[] temp = { name, name, pwd };
+//        for (int i = 0; i < this.users_data.size(); i++) {
+//            if (Objects.equals(this.users_data.get(i)[1], name)) {
+//                return 1; // 用户名重复
+//            }
+//        }
+        String[] temp = {name, name, pwd};
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
         this.users_data = refresh_data("users");
@@ -75,7 +76,7 @@ public class userBank {
     }
 
     public void write_user_score(String name, String topic, String finished_time, double score) throws IOException {
-        String[] temp = { name, topic, finished_time, "" + score };
+        String[] temp = {name, topic, finished_time, "" + score};
         this.users_scores_data.add(temp);
         try {
             write_to_csv(this.users_scores_data, users_scores_csv_path);
@@ -93,11 +94,12 @@ public class userBank {
             String[] temp = new String[4];
             temp[0] = topic_list[j];
             for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
-                if ((this.users_scores_data.get(i)[0] == name) && (this.users_scores_data.get(i)[1] == topic_list[j])) {
+                if ((Objects.equals(this.users_scores_data.get(i)[0], name)) && (Objects.equals(this.users_scores_data.get(i)[1], topic_list[j]))) {
                     if (counter < 3) {
                         temp[counter + 1] = this.users_scores_data.get(i)[3];
-                    } else {
-                        break;
+                        counter++;
+//                    } else {
+//                        break;
                     }
                 }
             }
@@ -109,15 +111,15 @@ public class userBank {
     public ArrayList<String[]> read_topic_score() {
         ArrayList<String[]> topics_score = new ArrayList<String[]>();
         for (int i = 0; i < topic_list.length; i++) {
-            String[] score = new String[] { "0", "0", "0", "0" };
+            String[] score = new String[]{"0", "0", "0", "0"};
             topics_score.add(score);
         }
-        for (int i = this.users_scores_data.size() - 1; i > -1; i--) {
+        for (String[] row : this.users_scores_data) {
             for (int j = 0; j < topic_list.length; j++) {
-                if (Objects.equals(this.users_scores_data.get(i)[1], topic_list[j])) {
-                    if (Double.parseDouble(this.users_scores_data.get(i)[3]) >= Double
-                            .parseDouble(topics_score.get(j)[3])) { // 大于等于可以取两个相同成绩中较早达成的一个
-                        topics_score.set(j, this.users_scores_data.get(i));
+                if (Objects.equals(row[1], topic_list[j])) {
+                    if (Double.parseDouble(row[3]) >Double
+                            .parseDouble(topics_score.get(j)[3])) {
+                        topics_score.set(j, row);
                     }
                     break;
                 }
