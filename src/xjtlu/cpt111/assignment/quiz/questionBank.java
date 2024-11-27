@@ -15,47 +15,59 @@ public class questionBank {
     private String[] topics;
 
     public questionBank() {
-        //构造读取
+        //read all question from
         String directoryPath = "resources/questionsBank";
         try {
             allQuestions = IOUtilities.readQuestions(directoryPath);
             extractTopics();
         } catch (Exception e) {
-            //IO错误抛出
+            //throw IO error
             throw new RuntimeException(e);
         }
     }
-    //获取主题
+    //get topic
     private void extractTopics() {
         List<String> topicList = new ArrayList<>();
-        //遍历问题获取主题
+        //traversal all questions to get topic
         for (Question question : allQuestions) {
             String topic = question.getTopic();
             if (!topicList.contains(topic)) {
                 topicList.add(topic);
             }
         }
-        topics = topicList.toArray(new String[0]); // 将列表转换为数组
+        topics = topicList.toArray(new String[0]); //turn to array
     }
-    //获取特定主题问题组
-    public static Question[] getSpecificTopic(Question[] questions, String topic) {
+    //Get a group of legal questions on a specific topic
+    private static Question[] getSpecificTopic(Question[] questions, String topic) {
         List<Question> filteredQuestions = new ArrayList<>();
+        //traversal all the question from input
         for (Question question : questions) {
-            if (question.getTopic().equals(topic)) {
+            int correctOptionNum = 0;
+            Option[] options = question.getOptions();
+            //traversal all options from this problem
+            for (Option option : options) {
+                //Determine how many are correct and count
+                if (option.isCorrectAnswer()){
+                    correctOptionNum++;
+                }
+            }
+            //Check whether it matches the topic and the number of options is greater than 1 and there is only one correct number of options and all part of a question exist.
+            if (question.getTopic().equals(topic) && options.length>1 && correctOptionNum==1 && question.getQuestionStatement()!=null && question.getTopic()!=null && question.getDifficulty()!=null) {
+                //Add legal questions to the problem group
                 filteredQuestions.add(question);
             }
         }
         return filteredQuestions.toArray(new Question[0]);
     }
-    //获取特定难度问题
-    public static Question getSpecificDifficulty(Question[] questions, Difficulty difficulty) {
+    //get specific difficulty question
+    private static Question getSpecificDifficulty(Question[] questions, Difficulty difficulty) {
         List<Question> filteredQuestions = new ArrayList<>();
         for (Question question : questions) {
             if (question.getDifficulty().equals(difficulty)) {
                 filteredQuestions.add(question);
             }
         }
-        //打乱索引
+        //disorganize indexes
         if (index == 0) {
             indexes = new ArrayList<>();
             for (int i = 0; i < filteredQuestions.size(); i++) {
@@ -63,9 +75,9 @@ public class questionBank {
             }
             Collections.shuffle(indexes);
         }
-        //重置索引
+        //reload indexes
         if (index < indexes.size()) {
-            int randomIndex = indexes.get(index++);
+            int randomIndex = indexes.get(index);
             return filteredQuestions.get(randomIndex);
         } else {
             index = 0;
@@ -86,14 +98,14 @@ public class questionBank {
         questionBank questionBank = new questionBank();
         Question[] allQuestions = questionBank.getAllQuestions();
         Question[] specificTopicQuestions = getSpecificTopic(allQuestions, topic);
-        //获取最终问题组
+        System.out.printf("%d legal question\n",specificTopicQuestions.length);
+        //get final questions
         if (specificTopicQuestions.length < questionNum) {
             return specificTopicQuestions;
         } else {
             Question[] finalQuestions = new Question[questionNum];
             int questionsAssigned = 0;
-
-            // 分配每个难度可平分数量的问题
+            // Assign each difficulty to an equal number of problems
             for (Difficulty difficulty : Difficulty.values()) {
                 int baseCount = questionNum / Difficulty.values().length;
                 for (int i = 0; i < baseCount && questionsAssigned < questionNum; i++) {
@@ -101,21 +113,21 @@ public class questionBank {
                 }
             }
 
-            // 随机填入随机难度问题
+            // Randomly fill in random difficulty questions for questions can not be divided equally
             int remainingQuestions = questionNum - questionsAssigned;
             for (int i = 0; i < remainingQuestions; i++) {
                 Difficulty randomDifficulty = Difficulty.values()[(int) (Math.random() * Difficulty.values().length)];
                 finalQuestions[questionsAssigned++] = getSpecificDifficulty(specificTopicQuestions, randomDifficulty);
             }
 
-            // 打乱最终的问题数组
+            // disorganize the final array of questions
             List<Question> finalQuestionsList = new ArrayList<>();
             for (Question q : finalQuestions) {
                 finalQuestionsList.add(q);
             }
             Collections.shuffle(finalQuestionsList);
 
-            // 将打乱后的List转回数组
+            // turn list to array
             for (int i = 0; i < finalQuestions.length; i++) {
                 finalQuestions[i] = finalQuestionsList.get(i);
             }
@@ -125,37 +137,22 @@ public class questionBank {
         }
     }
 
-    // 检查用户答案是否正确
+
     public boolean isUserAnswerCorrect(String userAnswer, Question question) {
-        // 假设用户的答案是以逗号分隔的字符串，例如 "1,3"
-        String[] userAnswerArray = userAnswer.split(",");
-        List<Integer> userAnswerList = new ArrayList<>();
-        for (String s : userAnswerArray) {
-            try {
-                userAnswerList.add(Integer.parseInt(s.trim()) - 1);
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid input. Please enter numbers only.");
-                return false;
-            }
-        }
-
-        Option[] options = question.getOptions();
-        for (Integer index : userAnswerList) {
+        try {
+            //creat indexes
+            int index = Integer.parseInt(userAnswer) - 1;
+            Option[] options = question.getOptions();
+            //check input
             if (index < 0 || index >= options.length) {
-                return false; // 用户输入的索引不在选项范围内
+                System.out.println("Invalid answer. Please enter a number between 1 and " + options.length);
+                throw new RuntimeException("Invalid answer.");
             }
-            if (!options[index].isCorrectAnswer()) {
-                return false; // 用户选择的选项中有一个不是正确答案
-            }
+            // check whether the user answer correct
+            return options[index].isCorrectAnswer();
+            //throw err
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
-
-        // 检查是否选择了所有正确答案
-        for (int i = 0; i < options.length; i++) {
-            if (options[i].isCorrectAnswer() && !userAnswerList.contains(i)) {
-                return false; // 存在正确答案未被选择
-            }
-        }
-
-        return true; // 所有用户选择的答案都是正确的
     }
 }
