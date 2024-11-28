@@ -131,8 +131,6 @@ public class questionBank {
             for (int i = 0; i < finalQuestions.length; i++) {
                 finalQuestions[i] = finalQuestionsList.get(i);
             }
-
-
             return finalQuestions;
         }
     }
