@@ -51,7 +51,7 @@ public class Main extends Application {
     private Stage Stage_Quiz2;
     private Stage Stage_Score;
 
-    public String UserName = new String();
+    public String UserName = "";
     questionBank qb = new questionBank();
     String[] topiclist = qb.getTopics();
 
@@ -68,7 +68,6 @@ public class Main extends Application {
             throw new RuntimeException(e);
         }
     }
-
 
     public static void main(String[] args) {
         System.out.println("System launched!\nAll the events will show below:");
@@ -187,7 +186,6 @@ public class Main extends Application {
         if (Stage1 != null && Stage1.isShowing()) {
             Stage1.hide();
         }
-
     }
 
     private void Register() {
@@ -197,8 +195,8 @@ public class Main extends Application {
             Stage_Register = new Stage();
             Stage_Register.setTitle("Register");
             Stage_Register.setResizable(false);
-            Stage_Register.setWidth(480);
-            Stage_Register.setHeight(270);
+            Stage_Register.setWidth(560);
+            Stage_Register.setHeight(315);
 
             GridPane grid = new GridPane();
             grid.setPadding(new Insets(10));
@@ -210,30 +208,54 @@ public class Main extends Application {
             grid.add(userLabel, 0, 0);
             final TextField usernameField = new TextField();
             grid.add(usernameField, 1, 0);
+            Label nameLabel = new Label("True name:");
+            grid.add(nameLabel, 0, 1);
+            final TextField nameField = new TextField();
+            grid.add(nameField, 1, 1);
+
             Label pass_Label = new Label("Password:");
             Label cfmpass_Label = new Label("Confirm Password:");
 
             Button confirmButton = new Button("Confirm");
+            Button backButton1 = new Button("Back");
+            backButton1.setOnAction(e -> {
+                Stage_Register.hide();
+                Stage1.show();
+            });
+            grid.add(backButton1, 1, 4);
+            Scene scene = new Scene(grid);
+            Stage_Register.setScene(scene);
+
             confirmButton.setOnAction(e -> {
                 String username = usernameField.getText();
-                usernameField.setEditable(false);           // lock up username textbox
+                usernameField.setEditable(false);           // lock up textbox
+                String trueName = nameField.getText();
+                nameField.setEditable(false);
                 if (username.length() < 2) {
                     // not allowing too short name
                     show_Info("Warning", "Username must be longer than 2 letters!");
+                    usernameField.setEditable(true);
+                    nameField.setEditable(true);
+                } else if (trueName.length() < 2) {
+                    show_Info("Warning", "Username must be longer than 2 letters!");
+                    usernameField.setEditable(true);
+                    nameField.setEditable(true);
                 } else if (!user.check_user(username)) {
                     //check whether username is already used
                     show_Info("Error", "Username has been chosen!");
+                    usernameField.setEditable(true);
+                    nameField.setEditable(true);
                 } else {
                     // if username is legal, display password items
                     confirmButton.setDisable(true);
-
-                    grid.add(pass_Label, 0, 1);
+                    backButton1.setDisable(true);
+                    grid.add(pass_Label, 0, 2);
                     PasswordField passwordField = new PasswordField();
-                    grid.add(passwordField, 1, 1);
+                    grid.add(passwordField, 1, 2);
 
-                    grid.add(cfmpass_Label, 0, 2);
+                    grid.add(cfmpass_Label, 0, 3);
                     PasswordField confirmPasswordField = new PasswordField();
-                    grid.add(confirmPasswordField, 1, 2);
+                    grid.add(confirmPasswordField, 1, 3);
 
                     Button registerButton = new Button("Register");
                     registerButton.setOnAction(event -> {
@@ -244,7 +266,7 @@ public class Main extends Application {
                         } else {
                             //write in user into database
                             try {
-                                user.write_user(username, password);    // from userBank
+                                user.write_user(username, trueName, password);    // from userBank
                                 show_Info("Success", "User successfully registered!");
                             } catch (IOException ex) {
                                 show_Info("Error", "Register Failed!\n" + ex.getMessage());
@@ -255,8 +277,8 @@ public class Main extends Application {
                         }
                     });
 
-                    Button backButton = new Button("Back");
-                    backButton.setOnAction(event -> {
+                    Button backButton2 = new Button("Back");
+                    backButton2.setOnAction(event -> {
                         //back button unlock username textfield and keep username, but clear password
                         usernameField.setEditable(true);
                         confirmButton.setDisable(false);
@@ -267,13 +289,13 @@ public class Main extends Application {
                         grid.getChildren().remove(pass_Label);
                         grid.getChildren().remove(cfmpass_Label);
                         grid.getChildren().remove(registerButton);
-                        grid.getChildren().remove(backButton);
+                        grid.getChildren().remove(backButton2);
                         // reset the scene
                         grid.setLayoutY(0);
                     });
 
-                    grid.add(registerButton, 1, 3);
-                    grid.add(backButton, 1, 4);
+                    grid.add(registerButton, 1, 4);
+                    grid.add(backButton2, 1, 5);
                     Stage_Register.show();
 
                     if (Stage1 != null && Stage1.isShowing()) {
@@ -281,20 +303,9 @@ public class Main extends Application {
                     }
                 }
             });
-            grid.add(confirmButton, 1, 2);
-
-
-            Button backButton = new Button("Back");
-            backButton.setOnAction(e -> {
-                Stage_Register.hide();
-                Stage1.show();
-            });
-            grid.add(backButton, 1, 3);
-            Scene scene = new Scene(grid);
-            Stage_Register.setScene(scene);
+            grid.add(confirmButton, 1, 3);
         }
         Stage_Register.show();
-
     }
 
     private void show_Stage2() {
@@ -414,7 +425,6 @@ public class Main extends Application {
             Stage_Dashboard.setScene(scene);
             Stage_Dashboard.show();
         }
-
     }
 
     private void Choose_Topic() {
@@ -430,57 +440,13 @@ public class Main extends Application {
             layout.setPadding(new Insets(10));
             layout.setAlignment(Pos.CENTER);
 
-//            // Place different topics
-//            Button computerScienceButton = new Button(topiclist[0]);
-//            computerScienceButton.setPrefWidth(200);
-//            Button electronicEngineeringButton = new Button(topiclist[1]);
-//            electronicEngineeringButton.setPrefWidth(200);
-//            Button englishButton = new Button(topiclist[2]);
-//            englishButton.setPrefWidth(200);
-//            Button mathematicsButton = new Button(topiclist[3]);
-//            mathematicsButton.setPrefWidth(200);
-
-//            layout.add(computerScienceButton, 0, 0);
-//            layout.add(electronicEngineeringButton, 0, 1);
-//            layout.add(englishButton, 0, 2);
-//            layout.add(mathematicsButton, 0, 3);
-//            layout.add(backButton, 2, 4);
-//
-//            backButton.setOnAction(e -> {
-//                Stage_Topic.hide();
-//                Stage2.show();
-//            });
-//            computerScienceButton.setOnAction(e -> {
-//                System.out.println("Computer Science selected");
-//                Stage_Topic.hide();
-//                Start_quiz("Computer Science");
-//            });
-//            electronicEngineeringButton.setOnAction(e -> {
-//                System.out.println("Electronic Engineering selected");
-//                Stage_Topic.hide();
-//                Start_quiz("Electronic Engineering");
-//
-//            });
-//            englishButton.setOnAction(e -> {
-//                System.out.println("English selected");
-//                Stage_Topic.hide();
-//                Start_quiz("English");
-//
-//            });
-//            mathematicsButton.setOnAction(e -> {
-//                System.out.println("Mathematics selected");
-//                Stage_Topic.hide();
-//                Start_quiz("Mathematics");
-//
-//            });
-
             for (int i = 0; i < numofTopics; i++) {
                 Button topicButton = new Button(topiclist[i]);
                 topicButton.setPrefWidth(200);
                 layout.getChildren().add(topicButton);
                 String topic = topiclist[i];
                 topicButton.setOnAction(e -> {
-                    System.out.println(topic+" selected");
+                    System.out.println(topic + " selected");
                     Stage_Topic.hide();
                     Start_quiz(topic);
                 });
@@ -635,8 +601,6 @@ public class Main extends Application {
                 Stage_Quiz2.close();
                 Start_quiz(topic);
             });
-
-
         }
     }
 
@@ -688,7 +652,6 @@ public class Main extends Application {
         Stage_Score.show();
     }
 
-
     private void Exit() {
         System.out.println("Exit button clicked");
         // ensure all stages are closed
@@ -707,7 +670,5 @@ public class Main extends Application {
         // System shuts
         System.out.println("System exited");
         System.exit(0);
-
     }
-
 }
