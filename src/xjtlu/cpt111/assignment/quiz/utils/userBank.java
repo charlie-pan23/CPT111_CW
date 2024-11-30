@@ -24,6 +24,7 @@ public class userBank {
     }
 
     private static ArrayList<String[]> read_csv(String filePath) throws IOException {
+
         ArrayList<String[]> temp = new ArrayList<String[]>();
         try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath))) {
             String line;
@@ -33,6 +34,7 @@ public class userBank {
                     temp.add(row);
                 }
             }
+            System.out.println("Read data from\t"+filePath);
             return temp;
         }
     }
