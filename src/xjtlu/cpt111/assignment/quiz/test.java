@@ -8,12 +8,16 @@ public class test {
         questionBank qp = new questionBank();
         Question[] questions = qp.getQuestions("Computer Science", 8);
         //具体实现例子
-        for (int i = 0; i < questions.length; i++) {
-            try {
-                Question firstQuestion = questions[i];
-                System.out.println(firstQuestion);
+        for (int a = 0; a < 5; a++) {
 
-                System.out.print("Enter your answer: ");
+
+            for (int i = 0; i < questions.length; i++) {
+                try {
+                    Question firstQuestion = questions[i];
+                    System.out.println(firstQuestion);
+
+                    System.out.print("Enter your answer: ");
+                    System.out.println(i);
 //                Scanner scanner = new Scanner(System.in);
 //                String userAnswer = scanner.nextLine();
 //                boolean isCorrect = qp.isUserAnswerCorrect(userAnswer, firstQuestion);
@@ -21,10 +25,11 @@ public class test {
 //                    System.out.println("Correct!");
 //                } else {
 //                    System.out.println("Incorrect!");
-                //}
-            } catch (Exception e) {
-                System.out.println("Invalid answer. Please try again.");
-                i--;
+                    //}
+                } catch (Exception e) {
+                    System.out.println("Invalid answer. Please try again.");
+                    i--;
+                }
             }
         }
     }

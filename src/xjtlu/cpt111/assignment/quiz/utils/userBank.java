@@ -63,13 +63,13 @@ public class userBank {
     }
 
 
-    public int write_user(String name, String pwd) throws IOException {
+    public int write_user(String name, String truename,String pwd) throws IOException {
 //        for (int i = 0; i < this.users_data.size(); i++) {
 //            if (Objects.equals(this.users_data.get(i)[1], name)) {
 //                return 1; // 用户名重复
 //            }
 //        }
-        String[] temp = {name, name, pwd};
+        String[] temp = {name, truename, pwd};
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
         this.users_data = refresh_data("users");
