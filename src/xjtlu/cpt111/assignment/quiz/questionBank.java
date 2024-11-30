@@ -151,7 +151,7 @@ public class questionBank {
                 if (i < finalQuestionsList.size()) {
                     finalQuestions[i] = finalQuestionsList.get(i);
                 } else {
-                    finalQuestions[i] = null; // 确保所有位置都被填充
+                    finalQuestions[i] = null;
                 }
             }
 
