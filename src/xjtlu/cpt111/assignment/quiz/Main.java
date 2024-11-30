@@ -586,7 +586,7 @@ public class Main extends Application {
             questionArea.setText(String.valueOf(Questions[lambdaContext.Index]));
             Stage_Quiz2.show();
 
-            lambdaContext.Index = 1;
+            lambdaContext.Index = 0;
             lambdaContext.score = 0;
 
             nextButton.setOnAction(e -> {
