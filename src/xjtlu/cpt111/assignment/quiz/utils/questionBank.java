@@ -1,8 +1,7 @@
-package xjtlu.cpt111.assignment.quiz;
+package xjtlu.cpt111.assignment.quiz.utils;
 import xjtlu.cpt111.assignment.quiz.models.Difficulty;
 import xjtlu.cpt111.assignment.quiz.models.Option;
 import xjtlu.cpt111.assignment.quiz.models.Question;
-import xjtlu.cpt111.assignment.quiz.utils.IOUtilities;
 
 import java.util.*;
 

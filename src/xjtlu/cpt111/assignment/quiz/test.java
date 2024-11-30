@@ -1,7 +1,6 @@
 package xjtlu.cpt111.assignment.quiz;
 import xjtlu.cpt111.assignment.quiz.models.Question;
-
-import java.util.Scanner;
+import xjtlu.cpt111.assignment.quiz.utils.questionBank;
 
 public class test {
     public static void main(String[] args) {
