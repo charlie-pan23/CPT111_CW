@@ -1,81 +1,171 @@
 package xjtlu.cpt111.assignment.quiz.utils;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+
+import xjtlu.cpt111.assignment.quiz.config.AppConstants;
+import xjtlu.cpt111.assignment.quiz.config.XmlInputStream;
 import xjtlu.cpt111.assignment.quiz.models.Difficulty;
 import xjtlu.cpt111.assignment.quiz.models.Option;
 import xjtlu.cpt111.assignment.quiz.models.Question;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.io.File;
-import java.util.ArrayList;
 
-public class IOUtilities {
-    public static Question[] readQuestions(String directoryPath) {
-        System.out.println("Reading questions from directory: " + directoryPath);
-        File directory = new File(directoryPath);
-        List<Question> questionList = new ArrayList<>();
+public class IOUtilities implements AppConstants {
+    private static final IOUtilities INSTANCE = new IOUtilities();
+    private static final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
 
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("The provided path is not a directory: " + directoryPath);
+    private static final void flushOutput() {
+        System.out.flush();
+        System.err.flush();
+    }
+
+    public static Question[] readQuestions(String path) {
+        if (null != path && !path.isBlank()) {
+            return readQuestions(Paths.get(path));
+        } else {
+            throw new IllegalArgumentException("Input path is null or empty!");
         }
+    }
 
-        // 遍历目录下的所有文件
-        File[] files = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"));
-        if (files != null) {
-            for (File file : files) {
-                try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                    String line;
-                    String topic = "";
-                    String questionText = "";
-                    String difficulty = "";
-                    List<String> options = new ArrayList<>();
-                    int correctOptionIndex = -1;
-                    int optionIndex = 0;
+    public static Question[] readQuestions(File file) {
+        if (null == file) {
+            throw new IllegalArgumentException("Input file is null!");
+        } else {
+            return readQuestions(file.toPath());
+        }
+    }
 
-                    while ((line = reader.readLine()) != null) {
-                        line = line.trim();
-                        if (line.startsWith("<topic>")) {
-                            topic = line.substring(7, line.length() - 8);
-                        } else if (line.startsWith("<questionString>")) {
-                            questionText = line.substring(16, line.length() - 17);
-                        } else if (line.startsWith("<option")) {
-                            boolean isCorrect = line.contains("answer=\"true\"");
-                            String optionText = line.replaceAll("<.*?>", "").trim();
-                            options.add(optionText);
-                            if (isCorrect) {
-                                correctOptionIndex = optionIndex;
-                            }
-                            optionIndex++;
-                        } else if (line.startsWith("</question>")) {
-                            // 将 difficulty 转换为 Difficulty 枚举
-                            Difficulty questionDifficulty = Difficulty.valueOf(difficulty.toUpperCase());
+    public static Question[] readQuestions(Path path) {
+        if (null == path) {
+            throw new IllegalArgumentException("Input path is null!");
+        } else {
+            return INSTANCE.readQuestionsFromXml(path);
+        }
+    }
 
-                            // 将字符串选项转换为 Option 对象列表
-                            List<Option> optionList = new ArrayList<>();
-                            for (int i = 0; i < options.size(); i++) {
-                                boolean isCorrect = (i == correctOptionIndex);
-                                optionList.add(new Option(options.get(i), isCorrect));
-                            }
+    private IOUtilities() {
+    }
 
-                            // 使用新的参数类型创建 Question 对象
-                            Question question = new Question(topic, questionDifficulty, questionText, optionList);
-                            questionList.add(question);
-
-                            // 清空选项列表和索引
-                            options.clear();
-                            optionIndex = 0;
-                        } else if (line.startsWith("<question difficulty=")) {
-                            difficulty = line.split("\"")[1];
-                        }
-                    }
+    private Question[] readQuestionsFromXml(Path path) {
+        if (!Files.exists(path, new LinkOption[0])) {
+            logErrorMessage("Path \"" + path + "\" does not exist!");
+            return null;
+        } else {
+            List<Path> filesToRead = new ArrayList<>();
+            if (Files.isDirectory(path, new LinkOption[0])) {
+                try {
+                    PathMatcher xmlFileMatcher = path.getFileSystem().getPathMatcher("glob:**/*.xml");
+                    Stream<Path> stream = Files.list(path).filter(Files::isRegularFile);
+                    filesToRead = stream.filter(xmlFileMatcher::matches).collect(Collectors.toList());
                 } catch (IOException e) {
-                    throw new RuntimeException("Error reading questions from file: " + file.getName(), e);
+                    flushOutput();
+                    e.printStackTrace();
+                }
+            } else if (Files.isRegularFile(path, new LinkOption[0])) {
+                filesToRead.add(path);
+            }
+
+            if (filesToRead.isEmpty()) {
+                logErrorMessage("NO files to read!");
+                return null;
+            } else {
+                List<Question> questions = new ArrayList<>();
+                for (Path p : filesToRead) {
+                    logMeesage("read questions from file \"" + p + "\"");
+
+                    try (InputStream ins = Files.newInputStream(p)) {
+                        List<Question> newQuestions = readQuestionsFromXml(ins);
+                        if (newQuestions != null && !newQuestions.isEmpty()) {
+                            logMeesage("-- " + newQuestions.size() + " new questions are found!");
+                            questions.addAll(newQuestions);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return questions.toArray(new Question[0]);
+            }
+        }
+    }
+
+    private List<Question> readQuestionsFromXml(InputStream ins) throws XMLStreamException {
+        XMLEventReader reader = xmlInputFactory.createXMLEventReader(new XmlInputStream(ins));
+        List<Question> newQuestions = new ArrayList<>();
+        String topic = null;
+        Difficulty difficulty = Question.DEFAULT_DIFFICULTY;
+        String questionString = null;
+        List<Option> options = null;
+
+        while (reader.hasNext()) {
+            XMLEvent nextEvent = reader.nextEvent();
+            if (nextEvent.isStartElement()) {
+                StartElement startElement = nextEvent.asStartElement();
+                switch (startElement.getName().getLocalPart()) {
+                    case "question":
+                        topic = null;
+                        difficulty = Question.DEFAULT_DIFFICULTY;
+                        questionString = null;
+                        options = new ArrayList<>();
+                        Attribute questionDifficulty = startElement.getAttributeByName(Model.TAG_DIFFICULTY);
+                        if (questionDifficulty != null) {
+                            try {
+                                difficulty = Difficulty.valueOf(questionDifficulty.getValue().toUpperCase());
+                            } catch (Exception ignored) {
+                            }
+                        }
+                        break;
+                    case "topic":
+                        topic = reader.nextEvent().asCharacters().getData();
+                        break;
+                    case "questionString":
+                        questionString = reader.nextEvent().asCharacters().getData();
+                        break;
+                    case "option":
+                        String optionStr = reader.nextEvent().asCharacters().getData();
+                        Attribute correctAnswer = startElement.getAttributeByName(Model.TAG_ANSWER);
+                        boolean isCorrectAnswer = "true".equalsIgnoreCase(correctAnswer != null ? correctAnswer.getValue() : "false");
+                        Option option = Option.newInstance(optionStr, isCorrectAnswer);
+                        options.add(option);
+                        break;
+                }
+            } else if (nextEvent.isEndElement()) {
+                EndElement endElement = nextEvent.asEndElement();
+                if ("question".equals(endElement.getName().getLocalPart())) {
+                    Question newQuestion = Question.newInstance(topic, difficulty, questionString, options);
+                    newQuestions.add(newQuestion);
                 }
             }
         }
 
-        return questionList.toArray(new Question[0]);
+        return newQuestions.isEmpty() ? null : newQuestions;
     }
 
+    private void logMeesage(String message) {
+        flushOutput();
+        System.out.println(message);
+        flushOutput();
+    }
+
+    private void logErrorMessage(String message) {
+        flushOutput();
+        System.err.println(message);
+        flushOutput();
+    }
 }
