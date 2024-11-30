@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import xjtlu.cpt111.assignment.quiz.models.Question;
+import xjtlu.cpt111.assignment.quiz.utils.questionBank;
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
 
 import static xjtlu.cpt111.assignment.quiz.utils.InfoDialog.show_Info;
@@ -155,6 +156,13 @@ public class Main extends Application {
         PasswordField passwordField = new PasswordField();
         grid.add(passwordField, 1, 1);
 
+        usernameField.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                passwordField.requestFocus();
+                event.consume();
+            }
+        });
+
         // Button with event reaction
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
@@ -171,6 +179,13 @@ public class Main extends Application {
             }
         });
         grid.add(loginButton, 1, 2);
+
+        passwordField.setOnKeyPressed(event -> {
+            if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                loginButton.fire();
+                event.consume();
+            }
+        });
 
         Button backButton = new Button("Back");
         backButton.setOnAction(e -> {
@@ -216,6 +231,13 @@ public class Main extends Application {
             Label pass_Label = new Label("Password:");
             Label cfmpass_Label = new Label("Confirm Password:");
 
+            usernameField.setOnKeyPressed(event -> {
+                if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                    nameField.requestFocus();
+                    event.consume();
+                }
+            });
+
             Button confirmButton = new Button("Confirm");
             Button backButton1 = new Button("Back");
             backButton1.setOnAction(e -> {
@@ -225,6 +247,13 @@ public class Main extends Application {
             grid.add(backButton1, 1, 4);
             Scene scene = new Scene(grid);
             Stage_Register.setScene(scene);
+
+            nameField.setOnKeyPressed(event -> {
+                if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+                    confirmButton.fire();
+                    event.consume();
+                }
+            });
 
             confirmButton.setOnAction(e -> {
                 String username = usernameField.getText();
@@ -261,6 +290,10 @@ public class Main extends Application {
                     registerButton.setOnAction(event -> {
                         String password = passwordField.getText();
                         String confirmPassword = confirmPasswordField.getText();
+                        if(password.length()<6 || confirmPassword.length()<6) {
+                            show_Info("Warning", "Password must be longer than 6 characters!");
+                        }
+
                         if (!password.equals(confirmPassword)) {
                             show_Info("Error", "Two passwords do not match!");
                         } else {
@@ -281,7 +314,9 @@ public class Main extends Application {
                     backButton2.setOnAction(event -> {
                         //back button unlock username textfield and keep username, but clear password
                         usernameField.setEditable(true);
+                        nameField.setEditable(true);
                         confirmButton.setDisable(false);
+                        backButton1.setDisable(false);
                         passwordField.clear();
                         confirmPasswordField.clear();
                         grid.getChildren().remove(passwordField);
@@ -552,20 +587,15 @@ public class Main extends Application {
             questionArea.setText(String.valueOf(Questions[lambdaContext.Index]));
             Stage_Quiz2.show();
 
-            lambdaContext.Index = 1;
+            lambdaContext.Index = 0;
             lambdaContext.score = 0;
 
             nextButton.setOnAction(e -> {
                 String userAnswer = answerField.getText();
                 if (!userAnswer.isEmpty()) {
-                    StringBuilder sendAnswer = new StringBuilder();
                     if (lambdaContext.Index < Questions.length) {
                         try {
-                            for (int i = 0; i < userAnswer.length(); i++) {
-                                sendAnswer.append(userAnswer.charAt(i));
-                                sendAnswer.append(i < userAnswer.length() - 1 ? "," : "");
-                            }
-                            if (qb.isUserAnswerCorrect(sendAnswer.toString(), Questions[lambdaContext.Index])) {
+                            if (qb.isUserAnswerCorrect(userAnswer, Questions[lambdaContext.Index])) {
                                 lambdaContext.score++;
                             }
 
@@ -591,8 +621,8 @@ public class Main extends Application {
             // when press ENTER equals to click nextButton
             answerField.setOnKeyPressed(event -> {
                 if (event.getCode() == KeyCode.ENTER) {
-                    nextButton.fire(); // 触发nextButton的事件
-                    event.consume(); // 消费事件，防止进一步传播
+                    nextButton.fire(); // equals to click nextButton
+                    event.consume(); // consume event
                 }
             });
 
