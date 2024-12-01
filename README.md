@@ -6,16 +6,42 @@ and interactive platform that enhances the learning experience through topic sel
 assignment.
 ## Existing problems
 - Do we need to redirection the err info to a log file?
-- 关于错误处理 我现在是都传到主类里去了 我们可以写一个函数来专门处理报错
+  - InfoDialog.java
 ## Task distribution
-### Main --pmc 
-- JavaFX
+### Main --pmc
+- GUI creating
+- Stage    
+  * Stage0
+    * initialize stage
+  * Stage1                    
+    * confirm and register stage
+  * Stage2                    
+    * operation selecting stage
+  * Stage_Login               
+    * stage for handling log in progress
+  * Stage_Register            
+    * stage for handling register progress
+  * Stage_Topic               
+    * topic selecting stage
+  * Stage_Dashboard           
+    * dashboard stage
+  * Stage_Leaderboard         
+    * leaderboard stage
+  * Stage_Quiz1               
+    * stage to start quiz
+  * Stage_Quiz2               
+    * stage to do quiz
+  * Stage_Score               
+    * stage to display score
+- InfoDialog.java
+  * show_Info(str title, str message) -> dispialy a standard information output stage
+
 ### Class userBank --lx
 - constructor   
   - usersBank(String[] topics_list)
 - Method
   - check_user(str name, str pwd) -> bool
-  - check_user(str name) -> bool 该用户名是否存在
+  - check_user(str name) -> bool 
   - write_user(str name, str pwd) -> int
   - write_user_score(str name, str topic, double score) 
   - read_user_score() -> ArrayList\<String[]\>
