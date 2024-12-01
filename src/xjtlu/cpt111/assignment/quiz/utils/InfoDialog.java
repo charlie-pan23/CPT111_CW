@@ -9,12 +9,6 @@ import javafx.stage.StageStyle;
 
 public class InfoDialog {
 
-    /**
-     * 显示一个信息对话框。
-     *
-     * @param title 对话框标题
-     * @param message 对话框消息
-     */
     public static void show_Info(String title, String message) {
         Stage errorStage = new Stage();
         errorStage.initStyle(StageStyle.UTILITY);

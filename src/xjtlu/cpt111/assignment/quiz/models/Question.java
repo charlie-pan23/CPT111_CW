@@ -2,6 +2,7 @@ package xjtlu.cpt111.assignment.quiz.models;
 import xjtlu.cpt111.assignment.quiz.config.AppConstants;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Question implements AppConstants {
@@ -96,6 +97,11 @@ public class Question implements AppConstants {
         this.difficulty = difficulty;
     }
 
+    public void shuffleOptions() {
+        Collections.shuffle(options);
+
+    }
+
     // toString methods
     @Override
     public String toString() {
@@ -105,7 +111,7 @@ public class Question implements AppConstants {
     public String toString(String prefix, boolean showErrorMessage) {
         StringBuilder sb = new StringBuilder(prefix + "Topic: " + topic + "\n" + prefix + "Question: " + questionStatement + "\n");
         for (int i = 0; i < options.size(); i++) {
-            sb.append(prefix).append(AppConstants.QUESTION_OPTION_INDENTATOR).append("Option ").append(i + 1).append(": ").append(options.get(i)).append("\n");
+            sb.append(prefix).append(AppConstants.QUESTION_OPTION_INDENTATOR).append("Option:").append(i+1).append("\t").append(options.get(i)).append("\n");
         }
         if (showErrorMessage) {
             sb.append(prefix).append("Error: Invalid question format.\n");

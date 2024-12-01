@@ -24,6 +24,7 @@ public class userBank {
     }
 
     private static ArrayList<String[]> read_csv(String filePath) throws IOException {
+
         ArrayList<String[]> temp = new ArrayList<String[]>();
         try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath))) {
             String line;
@@ -33,6 +34,7 @@ public class userBank {
                     temp.add(row);
                 }
             }
+            System.out.println("Read data from\t"+filePath);
             return temp;
         }
     }
@@ -57,8 +59,8 @@ public class userBank {
     }
 
 
-    public int write_user(String name, String pwd) throws IOException {
-        String[] temp = {name, name, pwd};
+    public int write_user(String name,String true_name, String pwd) throws IOException {
+        String[] temp = {name, true_name, pwd};
         this.users_data.add(temp);
         write_to_csv(this.users_data, users_csv_path);
         this.users_data = refresh_data("users");
