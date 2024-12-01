@@ -1,16 +1,11 @@
-package xjtlu.cpt111.assignment.quiz;
+package xjtlu.cpt111.assignment.quiz.utils;
 import xjtlu.cpt111.assignment.quiz.models.Difficulty;
 import xjtlu.cpt111.assignment.quiz.models.Option;
 import xjtlu.cpt111.assignment.quiz.models.Question;
-import xjtlu.cpt111.assignment.quiz.utils.IOUtilities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class questionBank {
-    private static List<Integer> indexes = new ArrayList<>();
-    private static int index = 0;
     private final Question[] allQuestions;
     private String[] topics;
 
@@ -20,6 +15,7 @@ public class questionBank {
         try {
             allQuestions = IOUtilities.readQuestions(directoryPath);
             extractTopics();
+            shuffleAllQuestions(); // Call this method to shuffle options for all questions
         } catch (Exception e) {
             //throw IO error
             throw new RuntimeException(e);
@@ -37,6 +33,13 @@ public class questionBank {
         }
         topics = topicList.toArray(new String[0]); //turn to array
     }
+
+    private void shuffleAllQuestions() {
+        for (Question question : allQuestions) {
+            question.shuffleOptions();
+        }
+    }
+
     //Get a group of legal questions on a specific topic
     private static Question[] getSpecificTopic(Question[] questions, String topic) {
         List<Question> filteredQuestions = new ArrayList<>();
@@ -67,23 +70,12 @@ public class questionBank {
                 filteredQuestions.add(question);
             }
         }
-        //disorganize indexes
-        if (index == 0) {
-            indexes = new ArrayList<>();
-            for (int i = 0; i < filteredQuestions.size(); i++) {
-                indexes.add(i);
-            }
-            Collections.shuffle(indexes);
+        if (filteredQuestions.isEmpty()) {
+            return null;
         }
-        //reload indexes
-        if (index < indexes.size()) {
-            int randomIndex = indexes.get(index);
-            return filteredQuestions.get(randomIndex);
-        } else {
-            index = 0;
-            Collections.shuffle(indexes);
-            return getSpecificDifficulty(questions, difficulty);
-        }
+        int randomIndex = new Random().nextInt(filteredQuestions.size());
+        return filteredQuestions.get(randomIndex);
+
     }
 
     public Question[] getAllQuestions() {
@@ -98,18 +90,24 @@ public class questionBank {
         questionBank questionBank = new questionBank();
         Question[] allQuestions = questionBank.getAllQuestions();
         Question[] specificTopicQuestions = getSpecificTopic(allQuestions, topic);
-        System.out.printf("%d legal question\n",specificTopicQuestions.length);
-        //get final questions
+        System.out.printf("%d legal question\n", specificTopicQuestions.length);
+
         if (specificTopicQuestions.length < questionNum) {
             return specificTopicQuestions;
         } else {
             Question[] finalQuestions = new Question[questionNum];
             int questionsAssigned = 0;
+            Set<Integer> usedIndexes = new HashSet<>();
+
             // Assign each difficulty to an equal number of problems
             for (Difficulty difficulty : Difficulty.values()) {
                 int baseCount = questionNum / Difficulty.values().length;
                 for (int i = 0; i < baseCount && questionsAssigned < questionNum; i++) {
-                    finalQuestions[questionsAssigned++] = getSpecificDifficulty(specificTopicQuestions, difficulty);
+                    Question question = getSpecificDifficulty(specificTopicQuestions, difficulty);
+                    if (question != null && !usedIndexes.contains(System.identityHashCode(question))) {
+                        finalQuestions[questionsAssigned++] = question;
+                        usedIndexes.add(System.identityHashCode(question));
+                    }
                 }
             }
 
@@ -117,20 +115,45 @@ public class questionBank {
             int remainingQuestions = questionNum - questionsAssigned;
             for (int i = 0; i < remainingQuestions; i++) {
                 Difficulty randomDifficulty = Difficulty.values()[(int) (Math.random() * Difficulty.values().length)];
-                finalQuestions[questionsAssigned++] = getSpecificDifficulty(specificTopicQuestions, randomDifficulty);
+                Question question = getSpecificDifficulty(specificTopicQuestions, randomDifficulty);
+                if (question != null && !usedIndexes.contains(System.identityHashCode(question))) {
+                    finalQuestions[questionsAssigned++] = question;
+                    usedIndexes.add(System.identityHashCode(question));
+                }
             }
 
-            // disorganize the final array of questions
+            if (questionsAssigned < questionNum) {
+                //try padding if exist null question
+                for (int i = 0; i < questionNum; i++) {
+                    if (questionsAssigned < questionNum) {
+                        Difficulty randomDifficulty = Difficulty.values()[(int) (Math.random() * Difficulty.values().length)];
+                        Question question = getSpecificDifficulty(specificTopicQuestions, randomDifficulty);
+                        if (question != null && !usedIndexes.contains(System.identityHashCode(question))) {
+                            finalQuestions[questionsAssigned++] = question;
+                            usedIndexes.add(System.identityHashCode(question));
+                        }
+                    }
+                }
+            }
+
+            // Shuffle the final array of questions
             List<Question> finalQuestionsList = new ArrayList<>();
             for (Question q : finalQuestions) {
-                finalQuestionsList.add(q);
+                if (q != null) {
+                    finalQuestionsList.add(q);
+                }
             }
             Collections.shuffle(finalQuestionsList);
 
-            // turn list to array
+            // Turn list to array
             for (int i = 0; i < finalQuestions.length; i++) {
-                finalQuestions[i] = finalQuestionsList.get(i);
+                if (i < finalQuestionsList.size()) {
+                    finalQuestions[i] = finalQuestionsList.get(i);
+                } else {
+                    finalQuestions[i] = null;
+                }
             }
+
             return finalQuestions;
         }
     }

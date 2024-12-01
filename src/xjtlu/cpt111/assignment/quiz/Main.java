@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import xjtlu.cpt111.assignment.quiz.models.Question;
+import xjtlu.cpt111.assignment.quiz.utils.questionBank;
 import xjtlu.cpt111.assignment.quiz.utils.userBank;
 
 import static xjtlu.cpt111.assignment.quiz.utils.InfoDialog.show_Info;
@@ -586,20 +587,15 @@ public class Main extends Application {
             questionArea.setText(String.valueOf(Questions[lambdaContext.Index]));
             Stage_Quiz2.show();
 
-            lambdaContext.Index = 1;
+            lambdaContext.Index = 0;
             lambdaContext.score = 0;
 
             nextButton.setOnAction(e -> {
                 String userAnswer = answerField.getText();
                 if (!userAnswer.isEmpty()) {
-                    StringBuilder sendAnswer = new StringBuilder();
                     if (lambdaContext.Index < Questions.length) {
                         try {
-                            for (int i = 0; i < userAnswer.length(); i++) {
-                                sendAnswer.append(userAnswer.charAt(i));
-                                sendAnswer.append(i < userAnswer.length() - 1 ? "," : "");
-                            }
-                            if (qb.isUserAnswerCorrect(sendAnswer.toString(), Questions[lambdaContext.Index])) {
+                            if (qb.isUserAnswerCorrect(userAnswer, Questions[lambdaContext.Index])) {
                                 lambdaContext.score++;
                             }
 

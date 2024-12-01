@@ -60,5 +60,65 @@
         <option>option 8-3</option>
         <option>option 8-4</option>
     </question>
+    <question difficulty="HARD">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 9</questionString>
+        <option>option 9-1</option>
+        <option answer="true">option 9-2</option>
+        <option>option 9-3</option>
+        <option>option 9-4</option>
+    </question>
+    <question difficulty="EASY">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 10</questionString>
+        <option>option 10-1</option>
+        <option answer="true">option 10-2</option>
+        <option>option 10-3</option>
+        <option answer="true">option 10-4</option>
+    </question>
+    <question difficulty="MEDIUM">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 11</questionString>
+        <option>option 11-1</option>
+        <option answer="true">option 11-2</option>
+    </question>
+    <question difficulty="VERY_HARD">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 12</questionString>
+        <option>option 12-1</option>
+        <option answer="true">option 12-2</option>
+        <option>option 12-3</option>
+        <option>option 12-4</option>
+    </question>
+    <question difficulty="HARD">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 13</questionString>
+        <option>option 13-1</option>
+        <option>option 13-2</option>
+        <option>option 13-3</option>
+        <option>option 13-4</option>
+        <option answer="true">option 13-5</option>
+        <option>option 13-6</option>
+    </question>
+    <question difficulty="EASY">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 14</questionString>
+        <option>option 14-1</option>
+        <option answer="true">option 14-2</option>
+        <option>option 14-3</option>
+    </question>
+    <question difficulty="MEDIUM">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 15</questionString>
+        <option answer="true">option 15-1</option>
+    </question>
+    <question difficulty="VERY_HARD">
+        <topic>Electronic Engineering</topic>
+        <questionString>Electronic Engineering Question 16</questionString>
+        <option>option 16-1</option>
+        <option answer="true">option 16-2</option>
+        <option>option 16-3</option>
+        <option>option 16-4</option>
+    </question>
 </questions>
 
