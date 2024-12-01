@@ -123,7 +123,7 @@ public class questionBank {
             }
 
             if (questionsAssigned < questionNum) {
-                //try to padding if exist null question
+                //try padding if exist null question
                 for (int i = 0; i < questionNum; i++) {
                     if (questionsAssigned < questionNum) {
                         Difficulty randomDifficulty = Difficulty.values()[(int) (Math.random() * Difficulty.values().length)];
